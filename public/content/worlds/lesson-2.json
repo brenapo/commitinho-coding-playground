@@ -1,0 +1,24 @@
+{
+  "id": "lesson-2",
+  "title": "Guardando palavras em uma caixinha (variáveis)",
+  "intro": {
+    "image": "/assets/commitinho/intro.png",
+    "title": "Guardando palavras na memória",
+    "text": "Hoje você vai guardar uma palavra em uma caixinha com nome e pedir para o computador mostrar o que guardou."
+  },
+  "activities": [
+    {
+      "id": "first_variable",
+      "type": "code_fill",
+      "title": "Sua primeira variável!",
+      "explain": "<h4 class=\"font-semibold text-lg mb-2\">O que é uma variável?</h4><p>Pense em uma <strong>caixinha com nome</strong> onde você guarda algo para usar depois. Em programação, essa caixinha é uma <strong>variável</strong>.</p><ul class=\"list-disc list-inside space-y-1 my-2\"><li>Para guardar algo usamos o sinal <code>=</code>.</li><li>Depois podemos mostrar o que está na caixinha com <code>print(nomeDaCaixa)</code>.</li><li>No Python, textos vão <em>entre aspas</em>.</li></ul><div class=\"mt-3 p-3 rounded-lg bg-white/5 border border-white/10\"><div class=\"text-sm opacity-90\">Exemplos</div><pre class=\"mt-1 rounded-md overflow-x-auto\"><code>nome = \"Luiza\"\nprint(nome)          → Luiza\nfruta = \"Banana!\"\nprint(fruta)         → Banana!</code></pre><p class=\"mt-2\"><strong>Dica:</strong> o nome da caixinha não tem espaços. Pode usar letras, números e <code>_</code> (underline).</p></div>",
+      "prompt": "Escolha o que vamos guardar na caixinha chamada <code>nome</code>.",
+      "starter": "nome = \"____\"\nprint(nome)",
+      "choices": ["Hello, World!", "Banana!", "Commitinho"],
+      "solutions": ["Hello, World!", "Banana!", "Commitinho"],
+      "successTemplate": "Mandou bem! Você guardou {{answer}} em <code>nome</code> e mostrou na tela. 🎉",
+      "commit_label": "Commitinho 🚀",
+      "xp": 15
+    }
+  ]
+}

@@ -13,6 +13,17 @@ export const lessons: Record<string, LessonData> = {
     xp_reward: 10,
     required_accuracy: 60
   },
+  'lesson-2': {
+    id: 'lesson-2',
+    world: 1,
+    skill: 1,
+    lesson: 2,
+    title: 'Guardando palavras em uma caixinha (variáveis)',
+    description: 'Aprenda a guardar valores em variáveis e recuperá-los.',
+    concept: 'Variáveis',
+    xp_reward: 15,
+    required_accuracy: 60
+  },
   '1-1-2': {
     id: '1-1-2',
     world: 1,

@@ -51,11 +51,13 @@ export const loadProgress = (): UserProgress => {
     // Handle version migrations if needed
     if (parsed.version !== CURRENT_VERSION) {
       console.log('🔄 Migrating progress data to new version');
-      // Add missing intro_done field if not present
-      if (!parsed.intro_done) {
-        parsed.intro_done = {};
-      }
       parsed.version = CURRENT_VERSION;
+    }
+
+    // Ensure intro_done field exists (for both new and old progress)
+    if (!parsed.intro_done) {
+      parsed.intro_done = {};
+      console.log('🔄 Added missing intro_done field');
     }
 
     // Update settings based on current user preferences
@@ -97,10 +99,13 @@ export const resetProgress = (): UserProgress => {
 
 // Mark lesson intro as completed
 export const markIntroCompleted = (progress: UserProgress, lessonId: string): UserProgress => {
+  // Ensure intro_done exists
+  const currentIntroData = progress.intro_done || {};
+  
   const updated = {
     ...progress,
     intro_done: {
-      ...progress.intro_done,
+      ...currentIntroData,
       [lessonId]: true
     },
     last_seen: new Date().toISOString()
@@ -112,7 +117,7 @@ export const markIntroCompleted = (progress: UserProgress, lessonId: string): Us
 
 // Check if lesson intro is completed
 export const isIntroCompleted = (progress: UserProgress, lessonId: string): boolean => {
-  return progress.intro_done[lessonId] === true;
+  return progress.intro_done?.[lessonId] === true;
 };
 
 // Check if user should be prompted for review

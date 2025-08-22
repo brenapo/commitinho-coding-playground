@@ -127,7 +127,7 @@ const Index = () => {
             <div className="flex justify-center lg:justify-end">
               <div className="relative">
                 <img 
-                  src="/lovable-uploads/ee82c2e5-f68a-417d-9f9d-0394381c468f.png" 
+                  src="/assets/commitinho-running.png" 
                   alt="Commitinho - Mascote da programação"
                   className="w-80 h-80 commitinho-mascot animate-float drop-shadow-2xl"
                 />

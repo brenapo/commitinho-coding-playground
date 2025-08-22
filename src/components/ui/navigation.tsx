@@ -8,17 +8,13 @@ const Navigation = () => {
     <nav className="bg-commitinho-surface border-b border-commitinho-surface-2">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo com mascote */}
-          <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+          {/* Logo horizontal */}
+          <Link to="/" className="flex items-center hover:opacity-80 transition-opacity">
             <img 
-              src="/lovable-uploads/ee82c2e5-f68a-417d-9f9d-0394381c468f.png" 
+              src="/assets/commitinho-logo.png" 
               alt="Commitinho"
-              className="w-10 h-10 commitinho-mascot"
+              className="h-20 w-auto"
             />
-            <div>
-              <span className="text-xl font-bold text-commitinho-text">Commitinho</span>
-              <p className="text-xs text-commitinho-text-soft -mt-1">seu amiguinho &lt;3</p>
-            </div>
           </Link>
           
           {/* Menu de navegação */}

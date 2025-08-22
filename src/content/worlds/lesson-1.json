@@ -1,0 +1,25 @@
+{
+  "id": "lesson-1",
+  "title": "Primeiros Passos",
+  "intro": {
+    "image": "/assets/commitinho/intro.png",
+    "title": "Primeiros passos no Terminal",
+    "text": "Nesta lição você vai usar o terminal para fazer o computador mostrar uma frase.",
+    "cta": { "label": "Iniciar Atividade", "goto": "hello_world" }
+  },
+  "activities": [
+    {
+      "id": "hello_world",
+      "type": "code_fill",
+      "title": "Seu primeiro código!",
+      "explain": "<h4 class=\"font-semibold text-lg mb-2\">O que é o Terminal?</h4><p>💬 Pense no terminal como um <strong>app de conversa</strong> com o computador, tipo um <strong>chat</strong>. Você envia uma mensagem chamada <strong>comando</strong> e ele responde.</p><ul class=\"list-disc list-inside space-y-1 my-2\"><li>Você <strong>escreve</strong> um comando.</li><li>O computador <strong>lê</strong> e faz o que foi pedido.</li><li>No Python, <code>print(...)</code> quer dizer: <em>mostre isso na tela</em>.</li></ul><div class=\"mt-3 p-3 rounded-lg bg-white/5 border border-white/10\"><div class=\"text-sm opacity-90\">Exemplos</div><pre class=\"mt-1 rounded-md overflow-x-auto\"><code>print(&quot;Olá!&quot;)                  → Olá!\nprint(&quot;Banana!&quot;)              → Banana!\nprint(&quot;Commitinho Rocks!&quot;)   → Commitinho Rocks!</code></pre><p class=\"mt-2\"><strong>Dica:</strong> qualquer texto <em>entre aspas</em> aparece na tela. Se não der certo de primeira, tente de novo 😉</p></div>",
+      "prompt": "Complete o comando escolhendo qualquer frase entre as aspas. Todas funcionam! 🎯",
+      "starter": "print(\"____\")",
+      "choices": ["Banana!", "Hello, World!", "Commitinho Rocks!"],
+      "solutions": ["Banana!", "Hello, World!", "Commitinho Rocks!"],
+      "successTemplate": "Você fez o computador dizer: {{answer}} 🎉",
+      "commit_label": "Concluir Lição 🚀",
+      "xp": 10
+    }
+  ]
+}
