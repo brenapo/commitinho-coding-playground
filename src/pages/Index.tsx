@@ -12,6 +12,7 @@ const Index = () => {
   const { 
     progress, 
     hasProgress, 
+    isLoading,
     resetUserProgress, 
     getProgressStats, 
     getNextLessonId, 
@@ -20,7 +21,16 @@ const Index = () => {
   const [showResetDialog, setShowResetDialog] = useState(false);
 
   const handleStartAdventure = () => {
+    console.log('Starting adventure...', { hasProgress, progress, isLoading });
+    
+    // Don't proceed if still loading
+    if (isLoading) {
+      console.log('Still loading progress, waiting...');
+      return;
+    }
+    
     if (hasProgress) {
+      console.log('User has progress, navigating to adventure...');
       // Check if should show review
       if (shouldShowReviewPrompt()) {
         // For now, just continue to adventure
@@ -30,6 +40,7 @@ const Index = () => {
         navigate('/aventura');
       }
     } else {
+      console.log('New user, navigating to first lesson...');
       // First time - start from lesson 1
       navigate('/licao/1-1-1');
     }
@@ -245,6 +256,7 @@ const Index = () => {
           </div>
         </div>
       </section>
+
     </div>
   );
 };

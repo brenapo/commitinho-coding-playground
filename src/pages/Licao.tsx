@@ -8,7 +8,6 @@ import { Star, ArrowLeft, ArrowRight, CheckCircle, Play, RotateCcw } from 'lucid
 import { LessonData } from '@/types/progress';
 import { useProgress } from '@/hooks/useProgress';
 import { getLessonById } from '@/data/curriculum';
-import SequenciaGame from '@/components/games/SequenciaGame';
 
 const Licao = () => {
   const { lessonId } = useParams<{ lessonId: string }>();
@@ -17,7 +16,6 @@ const Licao = () => {
   const [lesson, setLesson] = useState<LessonData | null>(null);
   const [isCompleted, setIsCompleted] = useState(false);
   const [accuracy, setAccuracy] = useState(0);
-  const [gameStarted, setGameStarted] = useState(false);
 
   useEffect(() => {
     if (!lessonId) {
@@ -50,47 +48,11 @@ const Licao = () => {
   }
 
   const handleStartLesson = () => {
-    setGameStarted(true);
-  };
-
-  const handleCompleteLesson = (finalAccuracy: number) => {
-    if (!progress || !lesson) return;
-
-    completeLessonProgress(lesson, finalAccuracy);
-    setIsCompleted(true);
-    setAccuracy(finalAccuracy);
-  };
-
-  const handleContinue = () => {
-    // Navigate to next lesson or back to adventure
-    const nextLessonId = getNextLessonId();
-    
-    if (nextLessonId) {
-      const nextLesson = getLessonById(nextLessonId);
-      if (nextLesson) {
-        navigate(`/licao/${nextLessonId}`);
-      } else {
-        navigate('/aventura');
-      }
-    } else {
-      navigate('/aventura');
-    }
-  };
-
-  const handleRestart = () => {
-    setIsCompleted(false);
-    setAccuracy(0);
-    setGameStarted(false);
-  };
-
-  const getStarsEarned = () => {
-    if (accuracy >= 85) return 3;
-    if (accuracy >= 70) return 2;
-    return 1;
+    // New game will be implemented here
+    console.log('Starting new game for lesson:', lessonId);
   };
 
   const currentStars = progress.stars[lesson.id] || 0;
-  const starsEarned = isCompleted ? getStarsEarned() : 0;
 
   return (
     <div className="min-h-screen bg-commitinho-bg">
@@ -116,12 +78,12 @@ const Licao = () => {
               </h1>
             </div>
 
-            <div className="flex items-center space-x-2" role="img" aria-label={`${Math.max(currentStars, starsEarned)} de 3 estrelas`}>
+            <div className="flex items-center space-x-2" role="img" aria-label={`${currentStars} de 3 estrelas`}>
               {[1, 2, 3].map((starNum) => (
                 <Star 
                   key={starNum}
                   className={`h-5 w-5 ${
-                    starNum <= Math.max(currentStars, starsEarned)
+                    starNum <= currentStars
                       ? 'fill-commitinho-warning text-commitinho-warning' 
                       : 'text-commitinho-surface-2'
                   }`}
@@ -172,100 +134,31 @@ const Licao = () => {
 
             {/* Game Area */}
             <div>
-              {!gameStarted && !isCompleted && (
-                <Card className="bg-commitinho-surface border-commitinho-surface-2">
-                  <CardHeader>
-                    <CardTitle className="text-commitinho-text">Área do Jogo</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center py-8">
-                      <div className="w-24 h-24 mx-auto mb-6 bg-gradient-arcade rounded-full flex items-center justify-center">
-                        <Play className="h-8 w-8 text-white" />
-                      </div>
-                      <h3 className="text-lg font-medium text-commitinho-text mb-2">
-                        Pronto para começar?
-                      </h3>
-                      <p className="text-commitinho-text-soft mb-6">
-                        Clique no botão abaixo para iniciar a atividade.
-                      </p>
-                      <Button 
-                        onClick={handleStartLesson}
-                        className="bg-gradient-arcade text-white font-semibold shadow-glow-primary hover:shadow-glow-secondary transition-all duration-300"
-                        aria-describedby="lesson-instructions"
-                      >
-                        Iniciar Atividade
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {gameStarted && !isCompleted && lessonId && (
-                <SequenciaGame 
-                  lessonId={lessonId}
-                  onComplete={handleCompleteLesson}
-                />
-              )}
-
-              {isCompleted && (
-                <Card className="bg-commitinho-success/10 border-commitinho-success">
-                  <CardContent className="p-6 text-center">
-                    <div className="w-24 h-24 mx-auto mb-6 bg-commitinho-success rounded-full flex items-center justify-center">
-                      <CheckCircle className="h-8 w-8 text-commitinho-success-foreground" />
+              <Card className="bg-commitinho-surface border-commitinho-surface-2">
+                <CardHeader>
+                  <CardTitle className="text-commitinho-text">Área do Jogo</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center py-8">
+                    <div className="w-24 h-24 mx-auto mb-6 bg-gradient-arcade rounded-full flex items-center justify-center">
+                      <Play className="h-8 w-8 text-white" />
                     </div>
                     <h3 className="text-lg font-medium text-commitinho-text mb-2">
-                      Parabéns! 🎉
+                      Pronto para começar?
                     </h3>
-                    <p className="text-commitinho-text-soft mb-4">
-                      Você completou a lição com {accuracy}% de precisão!
+                    <p className="text-commitinho-text-soft mb-6">
+                      Clique no botão abaixo para iniciar a atividade.
                     </p>
-                    
-                    {/* Stars earned */}
-                    <div className="flex justify-center space-x-1 mb-6">
-                      {[1, 2, 3].map((starNum) => (
-                        <Star 
-                          key={starNum}
-                          className={`h-6 w-6 ${
-                            starNum <= starsEarned
-                              ? 'fill-commitinho-warning text-commitinho-warning animate-bounce-in' 
-                              : 'text-commitinho-surface-2'
-                          }`}
-                          style={{ animationDelay: `${starNum * 0.2}s` }}
-                        />
-                      ))}
-                    </div>
-
-                    {/* XP gained */}
-                    <div className="bg-commitinho-warning/10 p-3 rounded-lg mb-6 max-w-xs mx-auto">
-                      <div className="text-commitinho-warning font-bold text-xl">
-                        +{lesson.xp_reward} XP
-                      </div>
-                      <div className="text-xs text-commitinho-text-soft">
-                        Total: {progress.xp} XP
-                      </div>
-                    </div>
-
-                    {/* Action buttons */}
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                      <Button 
-                        onClick={handleContinue}
-                        className="bg-gradient-arcade text-white font-semibold"
-                      >
-                        <ArrowRight className="mr-2 h-4 w-4" />
-                        Continuar
-                      </Button>
-                      <Button 
-                        variant="outline"
-                        onClick={handleRestart}
-                        className="border-commitinho-surface-2 text-commitinho-text hover:bg-commitinho-surface-2"
-                      >
-                        <RotateCcw className="mr-2 h-4 w-4" />
-                        Tentar Novamente
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+                    <Button 
+                      onClick={handleStartLesson}
+                      className="bg-gradient-arcade text-white font-semibold shadow-glow-primary hover:shadow-glow-secondary transition-all duration-300"
+                      aria-describedby="lesson-instructions"
+                    >
+                      Iniciar Atividade
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>

@@ -33,9 +33,14 @@ const dispatchProgressEvent = (event: ProgressEvent): void => {
 // Load progress from localStorage
 export const loadProgress = (): UserProgress => {
   try {
+    console.log('🎮 Loading progress from localStorage...');
     const stored = localStorage.getItem(STORAGE_KEY);
+    console.log('🎮 Stored data:', stored);
+    
     if (!stored) {
+      console.log('🎮 No stored progress, creating initial progress...');
       const initial = getInitialProgress();
+      console.log('🎮 Initial progress:', initial);
       dispatchProgressEvent({
         type: 'start',
         timestamp: new Date().toISOString(),
