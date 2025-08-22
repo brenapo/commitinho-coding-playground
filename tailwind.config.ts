@@ -52,16 +52,32 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				sidebar: {
-					DEFAULT: 'hsl(var(--sidebar-background))',
-					foreground: 'hsl(var(--sidebar-foreground))',
-					primary: 'hsl(var(--sidebar-primary))',
-					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-					accent: 'hsl(var(--sidebar-accent))',
-					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-					border: 'hsl(var(--sidebar-border))',
-					ring: 'hsl(var(--sidebar-ring))'
+				/* Tokens do tema Commitinho */
+				commitinho: {
+					bg: 'hsl(var(--bg))',
+					surface: 'hsl(var(--surface))',
+					'surface-2': 'hsl(var(--surface-2))',
+					text: 'hsl(var(--text))',
+					muted: 'hsl(var(--muted))',
+					success: 'hsl(var(--success))',
+					'success-foreground': 'hsl(var(--success-foreground))',
+					warning: 'hsl(var(--warning))',
+					'warning-foreground': 'hsl(var(--warning-foreground))'
 				}
+			},
+			backgroundImage: {
+				'gradient-arcade': 'var(--gradient-arcade)',
+				'gradient-glow': 'var(--gradient-glow)'
+			},
+			boxShadow: {
+				'glow-primary': 'var(--glow-primary)',
+				'glow-secondary': 'var(--glow-secondary)',
+				'glow-warning': 'var(--glow-warning)'
+			},
+			animation: {
+				'float': 'float 3s ease-in-out infinite',
+				'pixel-glow': 'pixel-glow 2s ease-in-out infinite',
+				'bounce-in': 'bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
