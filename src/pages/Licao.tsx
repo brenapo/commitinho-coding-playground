@@ -12,7 +12,14 @@ import { getLessonById } from '@/data/curriculum';
 const Licao = () => {
   const { lessonId } = useParams<{ lessonId: string }>();
   const navigate = useNavigate();
-  const { progress, isLoading, completeLessonProgress, getNextLessonId } = useProgress();
+  const { 
+    progress, 
+    isLoading, 
+    completeLessonProgress, 
+    getNextLessonId,
+    markLessonIntroCompleted,
+    isLessonIntroCompleted
+  } = useProgress();
   const [lesson, setLesson] = useState<LessonData | null>(null);
   const [isCompleted, setIsCompleted] = useState(false);
   const [accuracy, setAccuracy] = useState(0);
@@ -48,8 +55,22 @@ const Licao = () => {
   }
 
   const handleStartLesson = () => {
-    // New game will be implemented here
-    console.log('Starting new game for lesson:', lessonId);
+    if (!lessonId || !progress) return;
+
+    // Check if intro is completed for this lesson
+    const introCompleted = isLessonIntroCompleted(lessonId);
+    
+    if (introCompleted) {
+      // Intro already done - go directly to Praticar (game)
+      console.log('Intro completed, going to practice mode...');
+      // TODO: Navigate to practice/game mode
+    } else {
+      // First time - open Aprender (cards + micro-quiz)  
+      console.log('First time, opening learn mode...');
+      // Mark intro as completed
+      markLessonIntroCompleted(lessonId);
+      // TODO: Navigate to learn mode (intro cards + quiz)
+    }
   };
 
   const currentStars = progress.stars[lesson.id] || 0;
@@ -97,70 +118,50 @@ const Licao = () => {
 
       {/* Lesson Content */}
       <section className="px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-8">
-            {/* Instructions */}
-            <Card className="bg-commitinho-surface border-commitinho-surface-2">
-              <CardHeader>
-                <CardTitle className="text-commitinho-text flex items-center">
-                  <Play className="mr-2 h-5 w-5" />
-                  Instruções
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-commitinho-text-soft">
-                  {lesson.description}
-                </p>
-                
-                {/* Lesson objectives */}
-                <div className="bg-commitinho-surface-2 p-4 rounded-lg" id="lesson-instructions">
-                  <h4 className="font-medium text-commitinho-text mb-2">Objetivo:</h4>
-                  <ul className="text-sm text-commitinho-text-soft space-y-1">
-                    <li>• Pratique o conceito de <strong>{lesson.concept}</strong></li>
-                    <li>• Complete a atividade com pelo menos 60% de precisão</li>
-                    <li>• Ganhe entre 1-3 estrelas baseado no seu desempenho</li>
-                  </ul>
+        <div className="max-w-2xl mx-auto w-full">
+          {/* Commitinho Introduction - Centered Single Card */}
+          <Card className="bg-commitinho-surface border-commitinho-surface-2">
+            <CardContent className="p-8">
+              <div className="text-center space-y-6">
+                {/* Commitinho Image */}
+                <div className="flex justify-center">
+                  <img 
+                    src="/lovable-uploads/ee82c2e5-f68a-417d-9f9d-0394381c468f.png" 
+                    alt="Commitinho - Mascote da programação"
+                    className="w-32 h-32 commitinho-mascot animate-float"
+                  />
                 </div>
 
-                {/* XP Reward */}
-                <div className="flex items-center justify-between bg-commitinho-warning/10 p-3 rounded-lg">
-                  <span className="text-commitinho-text font-medium">Recompensa XP:</span>
-                  <Badge className="bg-commitinho-warning text-commitinho-warning-foreground">
-                    +{lesson.xp_reward} XP
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Game Area */}
-            <div>
-              <Card className="bg-commitinho-surface border-commitinho-surface-2">
-                <CardHeader>
-                  <CardTitle className="text-commitinho-text">Área do Jogo</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-8">
-                    <div className="w-24 h-24 mx-auto mb-6 bg-gradient-arcade rounded-full flex items-center justify-center">
-                      <Play className="h-8 w-8 text-white" />
-                    </div>
-                    <h3 className="text-lg font-medium text-commitinho-text mb-2">
-                      Pronto para começar?
+                {/* Speech Bubble */}
+                <div className="relative bg-white text-gray-800 p-6 rounded-2xl shadow-lg max-w-md mx-auto border border-gray-200">
+                  {/* Speech bubble tail */}
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[15px] border-r-[15px] border-b-[15px] border-l-transparent border-r-transparent border-b-white"></div>
+                  
+                  <div className="space-y-3">
+                    <h3 className="text-xl font-bold text-gray-800">
+                      Oi, eu sou o Commitinho! 👋
                     </h3>
-                    <p className="text-commitinho-text-soft mb-6">
-                      Clique no botão abaixo para iniciar a atividade.
+                    <p className="text-gray-700 leading-relaxed">
+                      Meu nome vem da palavra <strong>commit</strong>, que é como os programadores salvam o que aprenderam.
+                      Eu vou ser seu amiguinho e te ajudar nessa aventura pelo mundo da programação! 🚀
                     </p>
-                    <Button 
-                      onClick={handleStartLesson}
-                      className="bg-gradient-arcade text-white font-semibold shadow-glow-primary hover:shadow-glow-secondary transition-all duration-300"
-                      aria-describedby="lesson-instructions"
-                    >
-                      Iniciar Atividade
-                    </Button>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+                </div>
+
+                {/* Primary Action Button */}
+                <Button 
+                  onClick={handleStartLesson}
+                  size="lg"
+                  className="bg-gradient-arcade text-white font-semibold shadow-glow-primary hover:shadow-glow-secondary transition-all duration-300"
+                  role="button"
+                  aria-label="Iniciar atividade da lição"
+                >
+                  <Play className="mr-2 h-5 w-5" />
+                  Iniciar Atividade
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </section>
     </div>

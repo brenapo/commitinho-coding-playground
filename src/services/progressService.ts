@@ -15,6 +15,7 @@ const getInitialProgress = (): UserProgress => ({
   lesson: 1,
   unlocked: { '1-1': true },
   stars: {},
+  intro_done: {},
   settings: {
     reduced_motion: window.matchMedia('(prefers-reduced-motion: reduce)').matches
   }
@@ -33,14 +34,10 @@ const dispatchProgressEvent = (event: ProgressEvent): void => {
 // Load progress from localStorage
 export const loadProgress = (): UserProgress => {
   try {
-    console.log('🎮 Loading progress from localStorage...');
     const stored = localStorage.getItem(STORAGE_KEY);
-    console.log('🎮 Stored data:', stored);
     
     if (!stored) {
-      console.log('🎮 No stored progress, creating initial progress...');
       const initial = getInitialProgress();
-      console.log('🎮 Initial progress:', initial);
       dispatchProgressEvent({
         type: 'start',
         timestamp: new Date().toISOString(),
@@ -54,7 +51,10 @@ export const loadProgress = (): UserProgress => {
     // Handle version migrations if needed
     if (parsed.version !== CURRENT_VERSION) {
       console.log('🔄 Migrating progress data to new version');
-      // Future version migrations would go here
+      // Add missing intro_done field if not present
+      if (!parsed.intro_done) {
+        parsed.intro_done = {};
+      }
       parsed.version = CURRENT_VERSION;
     }
 
@@ -93,6 +93,26 @@ export const resetProgress = (): UserProgress => {
     console.error('❌ Failed to reset progress:', error);
     return getInitialProgress();
   }
+};
+
+// Mark lesson intro as completed
+export const markIntroCompleted = (progress: UserProgress, lessonId: string): UserProgress => {
+  const updated = {
+    ...progress,
+    intro_done: {
+      ...progress.intro_done,
+      [lessonId]: true
+    },
+    last_seen: new Date().toISOString()
+  };
+
+  saveProgress(updated);
+  return updated;
+};
+
+// Check if lesson intro is completed
+export const isIntroCompleted = (progress: UserProgress, lessonId: string): boolean => {
+  return progress.intro_done[lessonId] === true;
 };
 
 // Check if user should be prompted for review

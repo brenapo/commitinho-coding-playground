@@ -8,7 +8,9 @@ import {
   shouldShowReview,
   getNextLesson,
   isSkillUnlocked,
-  getSkillStars
+  getSkillStars,
+  markIntroCompleted,
+  isIntroCompleted
 } from '@/services/progressService';
 
 // Custom hook for managing user progress
@@ -88,6 +90,20 @@ export const useProgress = () => {
     return progress ? getSkillStars(progress, world, skill) : 0;
   }, [progress]);
 
+  // Mark intro as completed for a lesson
+  const markLessonIntroCompleted = useCallback((lessonId: string) => {
+    if (!progress) return;
+    
+    const updatedProgress = markIntroCompleted(progress, lessonId);
+    setProgress(updatedProgress);
+    return updatedProgress;
+  }, [progress]);
+
+  // Check if intro is completed for a lesson
+  const isLessonIntroCompleted = useCallback((lessonId: string) => {
+    return progress ? isIntroCompleted(progress, lessonId) : false;
+  }, [progress]);
+
   return {
     // State
     progress,
@@ -97,6 +113,7 @@ export const useProgress = () => {
     // Actions
     completeLessonProgress,
     resetUserProgress,
+    markLessonIntroCompleted,
     
     // Computed values
     getProgressStats,
@@ -104,5 +121,6 @@ export const useProgress = () => {
     shouldShowReviewPrompt,
     isSkillUnlockedForUser,
     getSkillStarsForUser,
+    isLessonIntroCompleted,
   };
 };

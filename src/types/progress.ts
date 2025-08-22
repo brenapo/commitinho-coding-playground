@@ -11,6 +11,7 @@ export interface UserProgress {
   lesson: number;
   unlocked: Record<string, boolean>; // "world-skill" format
   stars: Record<string, number>; // "world-skill-lesson" format, 0-3 stars
+  intro_done: Record<string, boolean>; // "world-skill-lesson" format, tracks intro completion
   settings: {
     reduced_motion: boolean;
   };
