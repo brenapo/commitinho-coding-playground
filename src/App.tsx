@@ -7,6 +7,8 @@ import Navigation from "@/components/ui/navigation";
 import ChatWidget from "@/components/ui/chat-widget";
 import Index from "./pages/Index";
 import Jogos from "./pages/Jogos";
+import Aventura from "./pages/Aventura";
+import Licao from "./pages/Licao";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +25,8 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/jogos" element={<Jogos />} />
+              <Route path="/aventura" element={<Aventura />} />
+              <Route path="/licao/:lessonId" element={<Licao />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

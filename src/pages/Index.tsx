@@ -1,8 +1,46 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Gamepad2, Trophy, MessageCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Gamepad2, Trophy, MessageCircle, Play, RotateCcw, Star } from "lucide-react";
+import { useProgress } from '@/hooks/useProgress';
 
 const Index = () => {
+  const navigate = useNavigate();
+  const { 
+    progress, 
+    hasProgress, 
+    resetUserProgress, 
+    getProgressStats, 
+    getNextLessonId, 
+    shouldShowReviewPrompt 
+  } = useProgress();
+  const [showResetDialog, setShowResetDialog] = useState(false);
+
+  const handleStartAdventure = () => {
+    if (hasProgress) {
+      // Check if should show review
+      if (shouldShowReviewPrompt()) {
+        // For now, just continue to adventure
+        // In a full implementation, you might show a review selection
+        navigate('/aventura');
+      } else {
+        navigate('/aventura');
+      }
+    } else {
+      // First time - start from lesson 1
+      navigate('/licao/1-1-1');
+    }
+  };
+
+  const handleResetProgress = () => {
+    resetUserProgress();
+    setShowResetDialog(false);
+  };
+
+  const stats = getProgressStats();
   return (
     <div className="min-h-screen bg-commitinho-bg">
       {/* Hero Section */}
@@ -28,19 +66,54 @@ const Index = () => {
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Button 
                   size="lg" 
-                  disabled
+                  onClick={handleStartAdventure}
                   className="bg-gradient-arcade text-white font-semibold shadow-glow-primary hover:shadow-glow-secondary transition-all duration-300"
                 >
                   <Gamepad2 className="mr-2 h-5 w-5" />
-                  Começar Aventura
+                  {hasProgress ? 'Continuar Aventura' : 'Começar Aventura'}
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="lg"
-                  className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
-                >
-                  Ver Demo
-                </Button>
+                {hasProgress ? (
+                  <AlertDialog open={showResetDialog} onOpenChange={setShowResetDialog}>
+                    <AlertDialogTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        size="lg"
+                        className="border-commitinho-surface-2 text-commitinho-text-soft hover:bg-commitinho-surface-2 hover:text-commitinho-text"
+                      >
+                        <RotateCcw className="mr-2 h-5 w-5" />
+                        Reiniciar Progresso
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="bg-commitinho-surface border-commitinho-surface-2">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle className="text-commitinho-text">Reiniciar Progresso?</AlertDialogTitle>
+                        <AlertDialogDescription className="text-commitinho-text-soft">
+                          Esta ação irá apagar todo o seu progresso atual, incluindo XP, estrelas e desbloqueios. Esta ação não pode ser desfeita.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel className="bg-commitinho-surface-2 text-commitinho-text border-commitinho-surface-2 hover:bg-commitinho-surface">
+                          Cancelar
+                        </AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={handleResetProgress}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          Sim, Reiniciar
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                ) : (
+                  <Button 
+                    variant="outline" 
+                    size="lg"
+                    onClick={() => navigate('/jogos')}
+                    className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                  >
+                    Ver Jogos
+                  </Button>
+                )}
               </div>
             </div>
             
@@ -58,6 +131,61 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Progress Section for returning users */}
+      {hasProgress && stats && (
+        <section className="px-4 py-12 bg-commitinho-surface-2">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-2xl font-bold text-center mb-8 text-commitinho-text">
+              Seu Progresso
+            </h2>
+            
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+              <Card className="bg-commitinho-surface border-commitinho-surface-2 text-center">
+                <CardContent className="p-4">
+                  <div className="text-2xl font-bold text-commitinho-warning mb-1">{stats.xp}</div>
+                  <div className="text-sm text-commitinho-text-soft">XP Total</div>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-commitinho-surface border-commitinho-surface-2 text-center">
+                <CardContent className="p-4">
+                  <div className="text-2xl font-bold text-primary mb-1">{stats.streak}</div>
+                  <div className="text-sm text-commitinho-text-soft">Dias Seguidos</div>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-commitinho-surface border-commitinho-surface-2 text-center">
+                <CardContent className="p-4">
+                  <div className="text-2xl font-bold text-secondary mb-1">{stats.stars}</div>
+                  <div className="text-sm text-commitinho-text-soft">Estrelas</div>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-commitinho-surface border-commitinho-surface-2 text-center">
+                <CardContent className="p-4">
+                  <div className="text-sm font-bold text-commitinho-success mb-1">{stats.currentSkill}</div>
+                  <div className="text-xs text-commitinho-text-soft">Posição Atual</div>
+                </CardContent>
+              </Card>
+            </div>
+            
+            <div className="text-center">
+              <p className="text-commitinho-text-soft mb-4">
+                Continue de onde parou ou explore a árvore de habilidades!
+              </p>
+              <Button 
+                onClick={() => navigate('/aventura')}
+                variant="outline"
+                className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+              >
+                <Trophy className="mr-2 h-4 w-4" />
+                Ver Árvore de Habilidades
+              </Button>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Cards "O que vem por aí" */}
       <section className="px-4 py-16 bg-commitinho-surface">

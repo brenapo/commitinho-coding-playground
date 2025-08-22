@@ -140,6 +140,25 @@ Paleta "noite arcade" com acentos vibrantes. Todas as cores em HSL.
     animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
   }
   
+  /* Respect reduced motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-float,
+    .animate-pixel-glow,
+    .animate-bounce-in {
+      animation: none;
+    }
+    
+    .commitinho-mascot {
+      animation: none;
+    }
+    
+    .shadow-glow-primary,
+    .shadow-glow-secondary,
+    .shadow-glow-warning {
+      transition: none;
+    }
+  }
+  
   /* Scrollbar personalizada */
   ::-webkit-scrollbar {
     width: 8px;
