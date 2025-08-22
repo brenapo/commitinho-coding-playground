@@ -86,8 +86,8 @@ const ChatWidget = () => {
 
   return (
     <>
-      {/* Launcher fixo */}
-      <div className="fixed top-4 right-4 z-50">
+      {/* Launcher fixo - movido para inferior direito */}
+      <div className="fixed bottom-4 right-4 z-50">
         <Button
           onClick={toggleChat}
           className={cn(
@@ -107,9 +107,9 @@ const ChatWidget = () => {
         </Button>
       </div>
 
-      {/* Painel do chat */}
+      {/* Painel do chat - ajustado para aparecer acima do botão */}
       {isOpen && (
-        <div className="fixed top-20 right-4 z-40 w-80 max-w-[90vw] sm:max-w-[380px]">
+        <div className="fixed bottom-20 right-4 z-40 w-80 max-w-[90vw] sm:max-w-[380px]">
           <div 
             className="bg-commitinho-surface border border-commitinho-surface-2 rounded-2xl shadow-xl animate-bounce-in"
             role="dialog"
