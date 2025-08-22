@@ -172,7 +172,7 @@ const ChatWidget = () => {
                   onChange={(e) => setMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Digite sua mensagem..."
-                  className="flex-1 px-3 py-2 bg-commitinho-bg border border-commitinho-surface-2 rounded-lg text-sm text-commitinho-text placeholder-commitinho-muted focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="flex-1 px-3 py-2 bg-commitinho-bg border border-commitinho-surface-2 rounded-lg text-sm text-commitinho-text placeholder-commitinho-text-soft focus:outline-none focus:ring-2 focus:ring-primary"
                 />
                 <Button
                   size="sm"
@@ -184,7 +184,7 @@ const ChatWidget = () => {
                   <Send className="h-4 w-4" />
                 </Button>
               </div>
-              <p className="text-xs text-commitinho-muted mt-2 text-center">
+              <p className="text-xs text-commitinho-text-soft mt-2 text-center">
                 💡 Em breve com IA de verdade!
               </p>
             </div>

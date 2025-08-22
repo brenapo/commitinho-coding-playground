@@ -59,6 +59,7 @@ export default {
 					'surface-2': 'hsl(var(--surface-2))',
 					text: 'hsl(var(--text))',
 					muted: 'hsl(var(--muted))',
+					'text-soft': 'hsl(var(--text-soft))',
 					success: 'hsl(var(--success))',
 					'success-foreground': 'hsl(var(--success-foreground))',
 					warning: 'hsl(var(--warning))',

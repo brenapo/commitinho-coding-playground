@@ -66,7 +66,7 @@ const Jogos = () => {
           <h1 className="text-4xl sm:text-5xl font-bold mb-6">
             <span className="gradient-text">Catálogo de Jogos</span>
           </h1>
-          <p className="text-lg text-commitinho-muted mb-8 max-w-2xl mx-auto">
+          <p className="text-lg text-commitinho-text-soft mb-8 max-w-2xl mx-auto">
             Aventuras divertidas para aprender programação! Cada jogo ensina conceitos importantes de forma interativa.
           </p>
           
@@ -110,7 +110,7 @@ const Jogos = () => {
                 </CardHeader>
                 
                 <CardContent className="space-y-4">
-                  <CardDescription className="text-commitinho-muted">
+                  <CardDescription className="text-commitinho-text-soft">
                     {jogo.descricao}
                   </CardDescription>
                   
@@ -134,7 +134,7 @@ const Jogos = () => {
                   {/* Botão de ação */}
                   <Button 
                     disabled 
-                    className="w-full bg-commitinho-surface-2 text-commitinho-muted cursor-not-allowed hover:bg-commitinho-surface-2"
+                    className="w-full bg-commitinho-surface-2 text-commitinho-text-soft cursor-not-allowed hover:bg-commitinho-surface-2"
                   >
                     <Lock className="mr-2 h-4 w-4" />
                     Em Breve
@@ -150,7 +150,7 @@ const Jogos = () => {
               <h3 className="text-2xl font-bold text-commitinho-text mb-4">
                 🚀 Mais jogos em desenvolvimento!
               </h3>
-              <p className="text-commitinho-muted mb-6">
+              <p className="text-commitinho-text-soft mb-6">
                 Nossa equipe está trabalhando duro para criar mais aventuras divertidas. 
                 Cada jogo é projetado para ensinar conceitos de programação de forma gradual e divertida.
               </p>
@@ -158,11 +158,11 @@ const Jogos = () => {
               <div className="grid sm:grid-cols-2 gap-4 text-sm">
                 <div className="bg-commitinho-surface-2 p-4 rounded-lg">
                   <p className="font-medium text-commitinho-text mb-1">⏱️ Sessões curtas</p>
-                  <p className="text-commitinho-muted">3-5 minutos por partida</p>
+                  <p className="text-commitinho-text-soft">3-5 minutos por partida</p>
                 </div>
                 <div className="bg-commitinho-surface-2 p-4 rounded-lg">
                   <p className="font-medium text-commitinho-text mb-1">🎯 Aprendizado gradual</p>
-                  <p className="text-commitinho-muted">Um conceito por vez</p>
+                  <p className="text-commitinho-text-soft">Um conceito por vez</p>
                 </div>
               </div>
             </div>

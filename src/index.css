@@ -13,7 +13,8 @@ Paleta "noite arcade" com acentos vibrantes. Todas as cores em HSL.
     --surface: 221 30% 15%;         /* Azul mais claro para cards */
     --surface-2: 221 25% 20%;       /* Superfície secundária */
     --text: 210 20% 98%;            /* Texto principal claro */
-    --muted: 220 15% 65%;           /* Texto secundário */
+    --muted: 191 50% 75%;           /* Texto secundário - mais vibrante com toque ciano */
+    --text-soft: 210 40% 85%;       /* Texto suave mas visível */
     
     /* Cores de acento do mascote */
     --primary: 191 95% 55%;         /* Ciano dos óculos/laptop */

@@ -16,7 +16,7 @@ const Index = () => {
                 <span className="gradient-text">brincando!</span>
               </h1>
               
-              <p className="text-lg sm:text-xl text-commitinho-muted mb-8 max-w-lg">
+              <p className="text-lg sm:text-xl text-commitinho-text-soft mb-8 max-w-lg">
                 Mini-jogos divertidos para explorar lógica e criatividade.
                 Descubra o mundo da programação de um jeito super legal!
               </p>
@@ -65,7 +65,7 @@ const Index = () => {
           <h2 className="text-3xl font-bold text-center mb-4 text-commitinho-text">
             O que vem por aí
           </h2>
-          <p className="text-center text-commitinho-muted mb-12 max-w-2xl mx-auto">
+          <p className="text-center text-commitinho-text-soft mb-12 max-w-2xl mx-auto">
             Estamos preparando experiências incríveis para tornar seu aprendizado ainda mais divertido!
           </p>
           
@@ -79,7 +79,7 @@ const Index = () => {
                 <CardTitle className="text-commitinho-text">Mini-jogos</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-commitinho-muted text-center">
+                <CardDescription className="text-commitinho-text-soft text-center">
                   Jogos interativos que ensinam conceitos de programação como sequência, repetição e condições de forma divertida.
                 </CardDescription>
               </CardContent>
@@ -94,7 +94,7 @@ const Index = () => {
                 <CardTitle className="text-commitinho-text">Conquistas</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-commitinho-muted text-center">
+                <CardDescription className="text-commitinho-text-soft text-center">
                   Colete estrelas e adesivos conforme completa os desafios. Cada vitória é uma nova descoberta!
                 </CardDescription>
               </CardContent>
@@ -109,7 +109,7 @@ const Index = () => {
                 <CardTitle className="text-commitinho-text">Dicas do Commitinho</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-commitinho-muted text-center">
+                <CardDescription className="text-commitinho-text-soft text-center">
                   Seu amiguinho digital sempre pronto para te ajudar com dicas e encorajamento durante a jornada.
                 </CardDescription>
               </CardContent>

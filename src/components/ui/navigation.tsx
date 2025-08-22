@@ -17,7 +17,7 @@ const Navigation = () => {
             />
             <div>
               <span className="text-xl font-bold text-commitinho-text">Commitinho</span>
-              <p className="text-xs text-commitinho-muted -mt-1">seu amiguinho &lt;3</p>
+              <p className="text-xs text-commitinho-text-soft -mt-1">seu amiguinho &lt;3</p>
             </div>
           </Link>
           
