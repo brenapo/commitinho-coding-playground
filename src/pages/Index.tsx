@@ -50,32 +50,32 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-commitinho-bg">
       {/* Hero Section */}
-      <section className="relative px-4 py-20 sm:py-32">
+      <section className="relative px-4 py-12 sm:py-20 lg:py-32">
         <div className="max-w-6xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Conteúdo do Hero */}
-            <div className="text-center lg:text-left">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
+            <div className="text-center lg:text-left order-2 lg:order-1">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 sm:mb-6 leading-tight">
                 <span className="text-commitinho-text">Aprenda programação </span>
                 <span className="gradient-text">brincando!</span>
               </h1>
               
-              <p className="text-lg sm:text-xl text-commitinho-text-soft mb-8 max-w-lg">
+              <p className="text-base sm:text-lg lg:text-xl text-commitinho-text-soft mb-6 sm:mb-8 max-w-lg mx-auto lg:mx-0">
                 Mini-jogos divertidos para explorar lógica e criatividade.
                 Descubra o mundo da programação de um jeito super legal!
               </p>
               
-              <div className="text-sm text-commitinho-warning mb-8 font-medium">
+              <div className="text-xs sm:text-sm text-commitinho-warning mb-6 sm:mb-8 font-medium">
                 "Commitinho, seu amiguinho &lt;3"
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <div className="flex flex-col gap-3 sm:gap-4 justify-center lg:justify-start">
                 <Button 
                   size="lg" 
                   onClick={handleStartAdventure}
-                  className="bg-gradient-arcade text-white font-semibold shadow-glow-primary hover:shadow-glow-secondary transition-all duration-300"
+                  className="w-full sm:w-auto bg-gradient-arcade text-white font-semibold shadow-glow-primary hover:shadow-glow-secondary transition-all duration-300 text-sm sm:text-base px-6 sm:px-8 py-3 sm:py-4"
                 >
-                  <Gamepad2 className="mr-2 h-5 w-5" />
+                  <Gamepad2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                   {hasProgress ? 'Continuar Aventura' : 'Começar Aventura'}
                 </Button>
                 {hasProgress ? (
@@ -84,26 +84,26 @@ const Index = () => {
                       <Button 
                         variant="outline" 
                         size="lg"
-                        className="border-commitinho-surface-2 text-commitinho-text-soft hover:bg-commitinho-surface-2 hover:text-commitinho-text"
+                        className="w-full sm:w-auto border-commitinho-surface-2 text-commitinho-text-soft hover:bg-commitinho-surface-2 hover:text-commitinho-text text-sm sm:text-base px-6 sm:px-8 py-3 sm:py-4"
                       >
-                        <RotateCcw className="mr-2 h-5 w-5" />
+                        <RotateCcw className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                         Reiniciar Progresso
                       </Button>
                     </AlertDialogTrigger>
-                    <AlertDialogContent className="bg-commitinho-surface border-commitinho-surface-2">
+                    <AlertDialogContent className="bg-commitinho-surface border-commitinho-surface-2 mx-4 max-w-lg">
                       <AlertDialogHeader>
-                        <AlertDialogTitle className="text-commitinho-text">Reiniciar Progresso?</AlertDialogTitle>
-                        <AlertDialogDescription className="text-commitinho-text-soft">
+                        <AlertDialogTitle className="text-commitinho-text text-lg sm:text-xl">Reiniciar Progresso?</AlertDialogTitle>
+                        <AlertDialogDescription className="text-commitinho-text-soft text-sm sm:text-base">
                           Esta ação irá apagar todo o seu progresso atual, incluindo XP, estrelas e desbloqueios. Esta ação não pode ser desfeita.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel className="bg-commitinho-surface-2 text-commitinho-text border-commitinho-surface-2 hover:bg-commitinho-surface">
+                      <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                        <AlertDialogCancel className="w-full sm:w-auto bg-commitinho-surface-2 text-commitinho-text border-commitinho-surface-2 hover:bg-commitinho-surface">
                           Cancelar
                         </AlertDialogCancel>
                         <AlertDialogAction 
                           onClick={handleResetProgress}
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          className="w-full sm:w-auto bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         >
                           Sim, Reiniciar
                         </AlertDialogAction>
@@ -115,7 +115,7 @@ const Index = () => {
                     variant="outline" 
                     size="lg"
                     onClick={() => navigate('/jogos')}
-                    className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                    className="w-full sm:w-auto border-primary text-primary hover:bg-primary hover:text-primary-foreground text-sm sm:text-base px-6 sm:px-8 py-3 sm:py-4"
                   >
                     Ver Jogos
                   </Button>
@@ -124,12 +124,12 @@ const Index = () => {
             </div>
             
             {/* Mascote Hero */}
-            <div className="flex justify-center lg:justify-end">
+            <div className="flex justify-center lg:justify-end order-1 lg:order-2">
               <div className="relative">
                 <img 
                   src="/assets/commitinho-running.png" 
                   alt="Commitinho - Mascote da programação"
-                  className="w-80 h-80 commitinho-mascot animate-float drop-shadow-2xl"
+                  className="w-48 h-48 sm:w-64 sm:h-64 lg:w-80 lg:h-80 commitinho-mascot animate-float drop-shadow-2xl"
                 />
                 <div className="absolute inset-0 bg-gradient-arcade opacity-20 rounded-full blur-3xl animate-pulse"></div>
               </div>
@@ -140,37 +140,37 @@ const Index = () => {
 
       {/* Progress Section for returning users */}
       {hasProgress && stats && (
-        <section className="px-4 py-12 bg-commitinho-surface-2">
+        <section className="px-4 py-8 sm:py-12 bg-commitinho-surface-2">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold text-center mb-8 text-commitinho-text">
+            <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 sm:mb-8 text-commitinho-text">
               Seu Progresso
             </h2>
             
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
               <Card className="bg-commitinho-surface border-commitinho-surface-2 text-center">
-                <CardContent className="p-4">
-                  <div className="text-2xl font-bold text-commitinho-warning mb-1">{stats.xp}</div>
-                  <div className="text-sm text-commitinho-text-soft">XP Total</div>
+                <CardContent className="p-3 sm:p-4">
+                  <div className="text-lg sm:text-2xl font-bold text-commitinho-warning mb-1">{stats.xp}</div>
+                  <div className="text-xs sm:text-sm text-commitinho-text-soft">XP Total</div>
                 </CardContent>
               </Card>
               
               <Card className="bg-commitinho-surface border-commitinho-surface-2 text-center">
-                <CardContent className="p-4">
-                  <div className="text-2xl font-bold text-primary mb-1">{stats.streak}</div>
-                  <div className="text-sm text-commitinho-text-soft">Dias Seguidos</div>
+                <CardContent className="p-3 sm:p-4">
+                  <div className="text-lg sm:text-2xl font-bold text-primary mb-1">{stats.streak}</div>
+                  <div className="text-xs sm:text-sm text-commitinho-text-soft">Dias Seguidos</div>
                 </CardContent>
               </Card>
               
               <Card className="bg-commitinho-surface border-commitinho-surface-2 text-center">
-                <CardContent className="p-4">
-                  <div className="text-2xl font-bold text-secondary mb-1">{stats.stars}</div>
-                  <div className="text-sm text-commitinho-text-soft">Estrelas</div>
+                <CardContent className="p-3 sm:p-4">
+                  <div className="text-lg sm:text-2xl font-bold text-secondary mb-1">{stats.stars}</div>
+                  <div className="text-xs sm:text-sm text-commitinho-text-soft">Estrelas</div>
                 </CardContent>
               </Card>
               
               <Card className="bg-commitinho-surface border-commitinho-surface-2 text-center">
-                <CardContent className="p-4">
-                  <div className="text-sm font-bold text-commitinho-success mb-1">{stats.currentSkill}</div>
+                <CardContent className="p-3 sm:p-4">
+                  <div className="text-xs sm:text-sm font-bold text-commitinho-success mb-1 leading-tight">{stats.currentSkill}</div>
                   <div className="text-xs text-commitinho-text-soft">Posição Atual</div>
                 </CardContent>
               </Card>
@@ -194,26 +194,26 @@ const Index = () => {
       )}
 
       {/* Cards "O que vem por aí" */}
-      <section className="px-4 py-16 bg-commitinho-surface">
+      <section className="px-4 py-12 sm:py-16 bg-commitinho-surface">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-4 text-commitinho-text">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3 sm:mb-4 text-commitinho-text">
             O que vem por aí
           </h2>
-          <p className="text-center text-commitinho-text-soft mb-12 max-w-2xl mx-auto">
+          <p className="text-center text-commitinho-text-soft mb-8 sm:mb-12 max-w-2xl mx-auto text-sm sm:text-base px-4">
             Estamos preparando experiências incríveis para tornar seu aprendizado ainda mais divertido!
           </p>
           
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid gap-6 sm:gap-8 md:grid-cols-3">
             {/* Card 1: Mini-jogos */}
             <Card className="bg-commitinho-surface-2 border-commitinho-surface-2 hover:shadow-glow-primary transition-all duration-300 group">
-              <CardHeader className="text-center">
-                <div className="w-16 h-16 bg-gradient-arcade rounded-full flex items-center justify-center mx-auto mb-4 group-hover:animate-pixel-glow">
-                  <Gamepad2 className="h-8 w-8 text-white" />
+              <CardHeader className="text-center px-4 py-4 sm:px-6 sm:py-6">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-arcade rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:animate-pixel-glow">
+                  <Gamepad2 className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
                 </div>
-                <CardTitle className="text-commitinho-text">Mini-jogos</CardTitle>
+                <CardTitle className="text-commitinho-text text-lg sm:text-xl">Mini-jogos</CardTitle>
               </CardHeader>
-              <CardContent>
-                <CardDescription className="text-commitinho-text-soft text-center">
+              <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
+                <CardDescription className="text-commitinho-text-soft text-center text-sm sm:text-base">
                   Jogos interativos que ensinam conceitos de programação como sequência, repetição e condições de forma divertida.
                 </CardDescription>
               </CardContent>
@@ -221,14 +221,14 @@ const Index = () => {
 
             {/* Card 2: Conquistas */}
             <Card className="bg-commitinho-surface-2 border-commitinho-surface-2 hover:shadow-glow-secondary transition-all duration-300 group">
-              <CardHeader className="text-center">
-                <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4 group-hover:animate-pixel-glow">
-                  <Trophy className="h-8 w-8 text-secondary-foreground" />
+              <CardHeader className="text-center px-4 py-4 sm:px-6 sm:py-6">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:animate-pixel-glow">
+                  <Trophy className="h-6 w-6 sm:h-8 sm:w-8 text-secondary-foreground" />
                 </div>
-                <CardTitle className="text-commitinho-text">Conquistas</CardTitle>
+                <CardTitle className="text-commitinho-text text-lg sm:text-xl">Conquistas</CardTitle>
               </CardHeader>
-              <CardContent>
-                <CardDescription className="text-commitinho-text-soft text-center">
+              <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
+                <CardDescription className="text-commitinho-text-soft text-center text-sm sm:text-base">
                   Colete estrelas e adesivos conforme completa os desafios. Cada vitória é uma nova descoberta!
                 </CardDescription>
               </CardContent>
@@ -236,14 +236,14 @@ const Index = () => {
 
             {/* Card 3: Dicas do Commitinho */}
             <Card className="bg-commitinho-surface-2 border-commitinho-surface-2 hover:shadow-glow-warning transition-all duration-300 group">
-              <CardHeader className="text-center">
-                <div className="w-16 h-16 bg-commitinho-success rounded-full flex items-center justify-center mx-auto mb-4 group-hover:animate-pixel-glow">
-                  <MessageCircle className="h-8 w-8 text-commitinho-success-foreground" />
+              <CardHeader className="text-center px-4 py-4 sm:px-6 sm:py-6">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-commitinho-success rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:animate-pixel-glow">
+                  <MessageCircle className="h-6 w-6 sm:h-8 sm:w-8 text-commitinho-success-foreground" />
                 </div>
-                <CardTitle className="text-commitinho-text">Dicas do Commitinho</CardTitle>
+                <CardTitle className="text-commitinho-text text-lg sm:text-xl">Dicas do Commitinho</CardTitle>
               </CardHeader>
-              <CardContent>
-                <CardDescription className="text-commitinho-text-soft text-center">
+              <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
+                <CardDescription className="text-commitinho-text-soft text-center text-sm sm:text-base">
                   Seu amiguinho digital sempre pronto para te ajudar com dicas e encorajamento durante a jornada.
                 </CardDescription>
               </CardContent>

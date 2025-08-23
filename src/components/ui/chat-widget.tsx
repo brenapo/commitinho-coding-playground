@@ -91,9 +91,9 @@ const ChatWidget = () => {
         <Button
           onClick={toggleChat}
           className={cn(
-            "h-14 px-4 rounded-full shadow-lg transition-all duration-300",
+            "h-12 sm:h-14 px-3 sm:px-4 rounded-full shadow-lg transition-all duration-300",
             "bg-primary hover:bg-primary/90 text-primary-foreground",
-            "flex items-center gap-3 animate-float",
+            "flex items-center gap-2 sm:gap-3 animate-float",
             isOpen && "scale-95"
           )}
           aria-label="Fale com o Commitinho"
@@ -101,15 +101,15 @@ const ChatWidget = () => {
           <img 
             src="/lovable-uploads/ee82c2e5-f68a-417d-9f9d-0394381c468f.png" 
             alt="Commitinho"
-            className="w-8 h-8 commitinho-mascot animate-pixel-glow"
+            className="w-6 h-6 sm:w-8 sm:h-8 commitinho-mascot animate-pixel-glow"
           />
-          <span className="font-medium hidden sm:block">Chat</span>
+          <span className="font-medium hidden sm:block text-sm">Chat</span>
         </Button>
       </div>
 
       {/* Painel do chat - ajustado para aparecer acima do botão */}
       {isOpen && (
-        <div className="fixed bottom-20 right-4 z-40 w-80 max-w-[90vw] sm:max-w-[380px]">
+        <div className="fixed bottom-16 sm:bottom-20 right-2 sm:right-4 z-40 w-[calc(100vw-16px)] max-w-80 sm:max-w-[380px]">
           <div 
             className="bg-commitinho-surface border border-commitinho-surface-2 rounded-2xl shadow-xl animate-bounce-in"
             role="dialog"
@@ -117,14 +117,14 @@ const ChatWidget = () => {
             aria-labelledby="chat-title"
           >
             {/* Cabeçalho */}
-            <div className="flex items-center justify-between p-4 border-b border-commitinho-surface-2">
-              <div className="flex items-center gap-3">
+            <div className="flex items-center justify-between p-3 sm:p-4 border-b border-commitinho-surface-2">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <img 
                   src="/lovable-uploads/ee82c2e5-f68a-417d-9f9d-0394381c468f.png" 
                   alt="Commitinho"
-                  className="w-8 h-8 commitinho-mascot"
+                  className="w-6 h-6 sm:w-8 sm:h-8 commitinho-mascot"
                 />
-                <h3 id="chat-title" className="font-semibold text-commitinho-text">
+                <h3 id="chat-title" className="font-semibold text-commitinho-text text-sm sm:text-base">
                   Fale com o Commitinho
                 </h3>
               </div>
@@ -132,15 +132,15 @@ const ChatWidget = () => {
                 variant="ghost"
                 size="sm"
                 onClick={toggleChat}
-                className="h-8 w-8 p-0 hover:bg-commitinho-surface-2"
+                className="h-6 w-6 sm:h-8 sm:w-8 p-0 hover:bg-commitinho-surface-2"
                 aria-label="Fechar chat"
               >
-                <X className="h-4 w-4" />
+                <X className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
             </div>
 
             {/* Mensagens */}
-            <div className="max-h-80 overflow-y-auto p-4 space-y-3">
+            <div className="max-h-60 sm:max-h-80 overflow-y-auto p-3 sm:p-4 space-y-2 sm:space-y-3">
               {messages.map((msg) => (
                 <div
                   key={msg.id}
@@ -151,7 +151,7 @@ const ChatWidget = () => {
                 >
                   <div
                     className={cn(
-                      "max-w-[80%] p-3 rounded-2xl text-sm",
+                      "max-w-[85%] sm:max-w-[80%] p-2 sm:p-3 rounded-2xl text-xs sm:text-sm",
                       msg.sender === "user"
                         ? "bg-primary text-primary-foreground"
                         : "bg-commitinho-surface-2 text-commitinho-text"
@@ -164,7 +164,7 @@ const ChatWidget = () => {
             </div>
 
             {/* Input */}
-            <div className="p-4 border-t border-commitinho-surface-2">
+            <div className="p-3 sm:p-4 border-t border-commitinho-surface-2">
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -172,16 +172,16 @@ const ChatWidget = () => {
                   onChange={(e) => setMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Digite sua mensagem..."
-                  className="flex-1 px-3 py-2 bg-commitinho-bg border border-commitinho-surface-2 rounded-lg text-sm text-commitinho-text placeholder-commitinho-text-soft focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="flex-1 px-2 sm:px-3 py-2 bg-commitinho-bg border border-commitinho-surface-2 rounded-lg text-xs sm:text-sm text-commitinho-text placeholder-commitinho-text-soft focus:outline-none focus:ring-2 focus:ring-primary"
                 />
                 <Button
                   size="sm"
                   onClick={handleSendMessage}
                   disabled={!message.trim()}
-                  className="px-3"
+                  className="px-2 sm:px-3"
                   aria-label="Enviar mensagem"
                 >
-                  <Send className="h-4 w-4" />
+                  <Send className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               </div>
               <p className="text-xs text-commitinho-text-soft mt-2 text-center">
