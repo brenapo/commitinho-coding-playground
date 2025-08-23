@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Gamepad2, Lock } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Jogos = () => {
   const jogos = [
@@ -132,13 +133,22 @@ const Jogos = () => {
                   </div>
                   
                   {/* Botão de ação */}
-                  <Button 
-                    disabled 
-                    className="w-full bg-commitinho-surface-2 text-commitinho-text-soft cursor-not-allowed hover:bg-commitinho-surface-2 text-sm sm:text-base py-2 sm:py-3"
-                  >
-                    <Lock className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-                    Em Breve
-                  </Button>
+                  {jogo.id === 1 ? (
+                    <Button asChild className="w-full bg-gradient-arcade text-white text-sm sm:text-base py-2 sm:py-3">
+                      <Link to="/jogo/robocorreio/1">
+                        <Gamepad2 className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                        Jogar
+                      </Link>
+                    </Button>
+                  ) : (
+                    <Button 
+                      disabled 
+                      className="w-full bg-commitinho-surface-2 text-commitinho-text-soft cursor-not-allowed hover:bg-commitinho-surface-2 text-sm sm:text-base py-2 sm:py-3"
+                    >
+                      <Lock className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                      Em Breve
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             ))}
