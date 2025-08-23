@@ -177,3 +177,20 @@ Paleta "noite arcade" com acentos vibrantes. Todas as cores em HSL.
     background: hsl(var(--secondary));
   }
 }
+
+@keyframes commitinho-bump {
+  0%   { transform: translateY(0); }
+  35%  { transform: translateY(-4px); }
+  100% { transform: translateY(0); }
+}
+
+.animate-commitinho-bump {
+  animation: commitinho-bump 180ms ease-in-out;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-commitinho-bump {
+    animation: none;
+  }
+}

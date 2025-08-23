@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Play, RotateCcw, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { useNavigate, useParams } from "react-router-dom";
 const ROBOT_IMG = "/assets/robocorreio/robot.png";
 const FACE_DEG: Record<Dir, number> = { E: 0, N: -90, W: 180, S: 90 };
@@ -84,7 +85,12 @@ export default function RoboCorreioGame() {
   const [program, setProgram] = useState<Cmd[]>([]);
   const [repeatCount, setRepeatCount] = useState<number>(1);
   const [playing, setPlaying] = useState(false);
-  const [showWin, setShowWin] = useState(false);
+  const [showWin, setShowWin] = useState(false)
+  const [currentIdx, setCurrentIdx] = useState<number | null>(null);
+  const [bump, setBump] = useState(false); // 👈 animação rápida ao errar
+
+
+
 
   // estado de simulação
   const [pos, setPos] = useState<Cell>(level.start);
@@ -98,15 +104,17 @@ export default function RoboCorreioGame() {
   }, [levelId]);
 
   function resetSim() {
-    setProgram([]);
-    setRepeatCount(1);
-    setPlaying(false);
-    setShowWin(false);
-    setPos({ x: level.start.x, y: level.start.y });
-    setDir(level.start.dir);
-    setHasLetter(false);
-    setDelivered(false);
-  }
+  setProgram([]);
+  setRepeatCount(1);
+  setPlaying(false);
+  setShowWin(false);
+  setCurrentIdx(null); // ⬅️ AQUI
+  setBump(false); 
+  setPos({ x: level.start.x, y: level.start.y });
+  setDir(level.start.dir);
+  setHasLetter(false);
+  setDelivered(false);
+}
 
   /** adicionar comandos (com repetição expandida) */
   function addCmd(cmd: Cmd) {
@@ -122,39 +130,44 @@ export default function RoboCorreioGame() {
   /** rodar passo-a-passo */
   const timer = useRef<number | null>(null);
   function run() {
-    if (playing || program.length === 0) return;
-    // reseta sim para rodar do começo
-    setPos({ x: level.start.x, y: level.start.y });
-    setDir(level.start.dir);
-    setHasLetter(false);
-    setDelivered(false);
+  if (playing || program.length === 0) return;
+  // reseta sim para rodar do começo
+  setPos({ x: level.start.x, y: level.start.y });
+  setDir(level.start.dir);
+  setHasLetter(false);
+  setDelivered(false);
 
-    setPlaying(true);
-    let i = 0;
+  setPlaying(true);
+  setCurrentIdx(null); // ✅ inicia sem destaque
 
-    const tick = () => {
-      const cmd = program[i];
-      if (!cmd) {
-        setPlaying(false);
-        if (deliveredRef.current) {
-          setShowWin(true);
-        }
-        return;
-      }
-      doStep(cmd);
-      i++;
-      timer.current = window.setTimeout(tick, 550);
-    };
+  let i = 0;
 
-    timer.current = window.setTimeout(tick, 300);
-  }
-  function stop() {
-    if (timer.current) {
-      clearTimeout(timer.current);
-      timer.current = null;
+  const tick = () => {
+    const cmd = program[i];
+    if (!cmd) {
+      setPlaying(false);
+      setCurrentIdx(null);      // ✅ remove destaque ao terminar
+      if (deliveredRef.current) setShowWin(true);
+      return;
     }
-    setPlaying(false);
+    setCurrentIdx(i);           // ✅ destaca a pílula atual
+    doStep(cmd);
+    i++;
+    timer.current = window.setTimeout(tick, 550);
+  };
+
+  timer.current = window.setTimeout(tick, 300);
+}
+
+  function stop() {
+  if (timer.current) {
+    clearTimeout(timer.current);
+    timer.current = null;
   }
+  setPlaying(false);
+  setCurrentIdx(null); // ← limpa o destaque da pílula atual
+  setBump(false); 
+}
 
   const posRef = useRef(pos);
   const dirRef = useRef(dir);
@@ -168,72 +181,90 @@ export default function RoboCorreioGame() {
   }, [pos, dir, hasLetter, delivered]);
 
   function doStep(cmd: Cmd) {
-    const { x, y } = posRef.current;
-    const d = dirRef.current;
+  const { x, y } = posRef.current;
+  const d = dirRef.current;
 
-    if (cmd === "ESQ") setDir(rotate(d, "L"));
-    if (cmd === "DIR") setDir(rotate(d, "R"));
-    if (cmd === "FRENTE") {
-      const n = stepForward(x, y, d);
-      // bloqueios: fora do tabuleiro ou parede
-      const out =
-        n.x < 0 || n.y < 0 || n.x >= level.width || n.y >= level.height;
-      const hitWall = (level.walls ?? []).some((w) => same(w, n));
-      if (!out && !hitWall) setPos(n);
-    }
-    if (cmd === "PEGAR") {
-      if (same(posRef.current, level.letter)) setHasLetter(true);
-    }
-    if (cmd === "ENTREGAR") {
-      if (hasLetterRef.current && same(posRef.current, level.mailbox)) {
-        setDelivered(true);
-      }
+  if (cmd === "ESQ") setDir(rotate(d, "L"));
+  if (cmd === "DIR") setDir(rotate(d, "R"));
+
+  if (cmd === "FRENTE") {
+    const n = stepForward(x, y, d);
+    const out = n.x < 0 || n.y < 0 || n.x >= level.width || n.y >= level.height;
+    const hitWall = (level.walls ?? []).some((w) => same(w, n));
+
+    if (!out && !hitWall) {
+      setPos(n);
+    } else {
+      // feedback: bateu
+      setBump(true);
+      setTimeout(() => setBump(false), 180);
+      toast("Ops! Tem parede na frente. Tente virar 😉", { duration: 1800 });
     }
   }
 
+  if (cmd === "PEGAR") {
+    if (same(posRef.current, level.letter)) {
+      setHasLetter(true);
+    } else {
+      toast("A carta está em outra casa. Vá até ela para pegar 💌", { duration: 1800 });
+    }
+  }
+
+  if (cmd === "ENTREGAR") {
+    if (hasLetterRef.current && same(posRef.current, level.mailbox)) {
+      setDelivered(true);
+      // (se você já implementou vitória imediata, aqui pode retornar true e parar no tick)
+    } else {
+      toast("Pegue a carta antes de entregar! 📮", { duration: 1800 });
+    }
+  }
+}
+
+
   /** célula → conteúdo visual */
   const grid = useMemo(() => {
-    const cells = [];
-    for (let yy = 0; yy < level.height; yy++) {
-      for (let xx = 0; xx < level.width; xx++) {
-        const here = { x: xx, y: yy };
-        const isWall = (level.walls ?? []).some((w) => same(w, here));
-        const isLetter = same(here, level.letter) && !hasLetter;
-        const isMailbox = same(here, level.mailbox);
-        const isRobot = same(here, pos);
+  const cells: JSX.Element[] = [];
+  for (let yy = 0; yy < level.height; yy++) {
+    for (let xx = 0; xx < level.width; xx++) {
+      const here = { x: xx, y: yy };
+      const isWall = (level.walls ?? []).some((w) => same(w, here));
+      const isLetter = same(here, level.letter) && !hasLetter;
+      const isMailbox = same(here, level.mailbox);
+      const isRobot = same(here, pos);
 
-        cells.push(
-  <div
-    key={`${xx}-${yy}`}
-    className={`relative border border-white/10 rounded-md flex items-center justify-center ${
-      isWall ? "bg-white/10" : "bg-white/5"
-    }`}
-    style={{ aspectRatio: "1 / 1", minHeight: 56 }}   // 👈 garante que o quadrado apareça
-  >
-    {isLetter && <span className="text-lg">✉️</span>}
-    {isMailbox && <span className="text-lg">📮</span>}
-    {isRobot && (
-  <img
-    src={ROBOT_IMG}
-    alt="Robô"
-    title={dir}
-    className="select-none pointer-events-none"
-    style={{
-      width: "70%",          // se quiser maior/menor, ajuste aqui
-      transform: `rotate(${FACE_DEG[dir]}deg)`,
-      transformOrigin: "50% 50%",
-      imageRendering: "auto", // deixe nítido
-    }}
-  />
-)}
-
-  </div>
-);
-
-      }
+      cells.push(
+        <div
+          key={`${xx}-${yy}`}
+          className={`relative border border-white/10 rounded-md flex items-center justify-center ${
+            isWall ? "bg-white/10" : "bg-white/5"
+          }`}
+          style={{ aspectRatio: "1 / 1", minHeight: 56 }}
+        >
+          {isLetter && <span className="text-lg">✉️</span>}
+          {isMailbox && <span className="text-lg">📮</span>}
+          {isRobot && (
+            <div className={bump ? "animate-commitinho-bump" : ""}>
+              <img
+                src={ROBOT_IMG}
+                alt="Robô"
+                title={dir}
+                className="select-none pointer-events-none"
+                style={{
+                  width: "70%",
+                  transform: `rotate(${FACE_DEG[dir]}deg)`,
+                  transformOrigin: "50% 50%",
+                  imageRendering: "auto",
+                }}
+              />
+            </div>
+          )}
+        </div>
+      );
     }
-    return cells;
-  }, [level, pos, hasLetter]);
+  }
+  return cells;
+}, [level, pos, hasLetter, dir, bump]);
+
 
   return (
     <div className="min-h-screen bg-commitinho-bg px-4 py-6">
