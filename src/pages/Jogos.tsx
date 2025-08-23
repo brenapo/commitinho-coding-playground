@@ -133,9 +133,9 @@ const Jogos = () => {
                   </div>
                   
                   {/* Botão de ação */}
-                  {jogo.id === 1 ? (
+                  {[1, 2].includes(jogo.id) ? (
                     <Button asChild className="w-full bg-gradient-arcade text-white text-sm sm:text-base py-2 sm:py-3">
-                      <Link to="/jogo/robocorreio/1">
+                      <Link to={jogo.id === 1 ? "/jogo/robocorreio/1" : "/jogo/pocoes/1"}>
                         <Gamepad2 className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                         Jogar
                       </Link>
