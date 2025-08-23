@@ -8,24 +8,6 @@ An educational coding game to teach core programming ideas (sequence and repetit
 - **Supabase** (auth/data)
 - Icons: **lucide-react**
 
----
-
-## Features (current)
-- **Robo-Mail — Level 1**
-  - 5×5 grid board with a PNG robot (rotates by direction)
-  - Command palette: **Forward**, **Turn Left**, **Turn Right**, **Pick**, **Deliver**
-  - Program list with **repeat count** to add multiple steps at once
-  - **Run / Stop** execution loop
-  - **Immediate win** when a valid **Deliver** happens on the mailbox with the letter
-  - **Step highlight** during execution (helps kids “read” the program)
-  - **Friendly error feedback** (toasts + small “bump” animation) when:
-    - hitting walls/borders,
-    - picking away from the letter,
-    - delivering without the letter
-- Games catalog with Robo-Mail enabled; other games marked **Coming Soon**
-- Lesson pages routes (kept from the learning flow)
-
----
 
 ## Getting Started
 
