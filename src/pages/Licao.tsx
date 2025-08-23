@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Star, ArrowLeft, CheckCircle, Play, Code } from 'lucide-react';
 import { LessonData } from '@/types/progress';
-import { useProgress } from '@/hooks/useProgress';
+import { useSupabaseProgress } from '@/hooks/useSupabaseProgress';
 import { getLessonById } from '@/data/curriculum';
 import { lesson1Data } from '@/data/lessons/lesson-1';
 import { lesson2Data } from '@/data/lessons/lesson-2';
@@ -49,7 +49,7 @@ const Licao = () => {
     progress, 
     isLoading, 
     completeLessonProgress
-  } = useProgress();
+  } = useSupabaseProgress();
   
   const [lesson, setLesson] = useState<LessonData | null>(null);
   const [lessonContent, setLessonContent] = useState<LessonContent | null>(null);

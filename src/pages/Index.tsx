@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Gamepad2, Trophy, MessageCircle, Play, RotateCcw, Star } from "lucide-react";
-import { useProgress } from '@/hooks/useProgress';
+import { useSupabaseProgress } from '@/hooks/useSupabaseProgress';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ const Index = () => {
     getProgressStats, 
     getNextLessonId, 
     shouldShowReviewPrompt 
-  } = useProgress();
+  } = useSupabaseProgress();
   const [showResetDialog, setShowResetDialog] = useState(false);
 
   const handleStartAdventure = () => {

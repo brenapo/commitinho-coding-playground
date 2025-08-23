@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Star, Play, Lock, RotateCcw, Trophy } from 'lucide-react';
 import { UserProgress, SkillNode } from '@/types/progress';
-import { useProgress } from '@/hooks/useProgress';
+import { useSupabaseProgress } from '@/hooks/useSupabaseProgress';
 import { curriculum } from '@/data/curriculum';
 
 const Aventura = () => {
@@ -17,7 +17,7 @@ const Aventura = () => {
     getNextLessonId, 
     isSkillUnlockedForUser, 
     getSkillStarsForUser 
-  } = useProgress();
+  } = useSupabaseProgress();
 
   if (isLoading || !progress) {
     return (
