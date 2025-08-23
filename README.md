@@ -1,73 +1,121 @@
-# Welcome to your Lovable project
+# Commitinho — Robo-Mail (Vite + React + TypeScript)
 
-## Project info
+An educational coding game to teach core programming ideas (sequence and repetition) by guiding a little mail robot to **pick up a letter** and **deliver it to the mailbox**. Built for kids, with gentle feedback and a playful UI.
 
-**URL**: https://lovable.dev/projects/736d60a5-18d1-47a4-8817-76fc642c53da
+## Tech Stack
+- **Vite** + **React** + **TypeScript**
+- **shadcn-ui** + **Tailwind CSS**
+- **Supabase** (auth/data)
+- Icons: **lucide-react**
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## Features (current)
+- **Robo-Mail — Level 1**
+  - 5×5 grid board with a PNG robot (rotates by direction)
+  - Command palette: **Forward**, **Turn Left**, **Turn Right**, **Pick**, **Deliver**
+  - Program list with **repeat count** to add multiple steps at once
+  - **Run / Stop** execution loop
+  - **Immediate win** when a valid **Deliver** happens on the mailbox with the letter
+  - **Step highlight** during execution (helps kids “read” the program)
+  - **Friendly error feedback** (toasts + small “bump” animation) when:
+    - hitting walls/borders,
+    - picking away from the letter,
+    - delivering without the letter
+- Games catalog with Robo-Mail enabled; other games marked **Coming Soon**
+- Lesson pages routes (kept from the learning flow)
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/736d60a5-18d1-47a4-8817-76fc642c53da) and start prompting.
+## Getting Started
 
-Changes made via Lovable will be committed automatically to this repo.
+### Prerequisites
+- **Node.js 18+** and **npm** (or pnpm/yarn)
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
+### Install & Run
+```bash
 npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
-```
+Vite will print the local URL in the terminal (e.g. http://localhost:5173 or your configured port).
 
-**Edit a file directly in GitHub**
+Environment Variables
+Create a .env.local file in the project root:
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+ini
+Copy
+Edit
+VITE_SUPABASE_URL=https://YOUR-PROJECT.supabase.co
+VITE_SUPABASE_ANON_KEY=YOUR_ANON_KEY
+App Routes
+Games catalog: /jogos
 
-**Use GitHub Codespaces**
+Play Robo-Mail (Level 1): /jogo/robocorreio/1
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Lessons: /licao/:lessonId
 
-## What technologies are used for this project?
+Adventure / home: /aventura
 
-This project is built with:
+Tip: during development, open http://localhost:<PORT>/jogo/robocorreio/1.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Project Structure (excerpt)
+bash
+Copy
+Edit
+src/
+  components/
+    games/
+      robocorreiogame.tsx        # Robo-Mail Level 1 (board, commands, execution)
+  pages/
+    Jogos.tsx                    # Games catalog (Robo-Mail enabled)
+    Licao.tsx                    # Lesson player
+    Aventura.tsx                 # Adventure / home
+  components/ui/…                # shadcn-ui components
+  index.css                      # global styles (includes robot “bump” animation)
+  main.tsx                       # Vite entry
+  App.tsx                        # Router
+Available Scripts
+npm run dev — start Vite dev server with HMR
 
-## How can I deploy this project?
+npm run build — production build to dist/
 
-Simply open [Lovable](https://lovable.dev/projects/736d60a5-18d1-47a4-8817-76fc642c53da) and click on Share -> Publish.
+npm run preview — preview the built app locally
 
-## Can I connect a custom domain to my Lovable project?
+Supabase Configuration (Auth/CORS)
+In your Supabase project:
 
-Yes, you can!
+Authentication → URL Configuration
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Site URL: your production URL (when you deploy)
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Additional Redirect URLs: add your dev URL (e.g., http://localhost:5173)
+
+CORS (and Storage CORS, if you use Storage):
+
+Add your dev and production URLs
+
+Deployment (without Lovable)
+Any static host works. Example with Vercel or Netlify:
+
+Build command: npm run build
+
+Output directory: dist
+
+Set the env vars VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in the hosting dashboard.
+
+Roadmap (next)
+Execution speed control (Slow / Normal / Fast)
+
+More Robo-Mail levels (introduce obstacles, turns, and efficiency goals)
+
+Stars/XP integration with Supabase progress
+
+Optional PNGs for letter/mailbox; sound effects and polish
+
+License
+MIT
+
+css
+Copy
+Edit
+
+If you want a shorter or more formal version, tell me your preference and I’ll tailor 
