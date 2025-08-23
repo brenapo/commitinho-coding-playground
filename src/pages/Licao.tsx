@@ -266,9 +266,7 @@ const Licao = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <p className="text-commitinho-text-soft">
-                {activity.prompt}
-              </p>
+              <div className="text-commitinho-text-soft" dangerouslySetInnerHTML={{ __html: activity.prompt }} />
 
               {/* Code Editor */}
               <div className="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-lg border-2 border-gray-700">
@@ -278,7 +276,7 @@ const Licao = () => {
                   <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
                   <span className="text-gray-400 text-sm ml-2">Python Terminal</span>
                 </div>
-                <code className="block">{getDisplayCode()}</code>
+                <pre className="block whitespace-pre-wrap"><code>{getDisplayCode()}</code></pre>
                 {hasExecuted && isCorrect && (
                   <div className="mt-2 text-white">
                     <span className="text-gray-400">{'> '}</span>
@@ -360,9 +358,7 @@ const Licao = () => {
           <DialogHeader>
             <DialogTitle className="text-center">
               <div className="text-6xl mb-4">🎉</div>
-              <div className="text-xl font-bold text-commitinho-success">
-                {successMessage}
-              </div>
+              <div className="text-xl font-bold text-commitinho-success" dangerouslySetInnerHTML={{ __html: successMessage }} />
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 text-center">
