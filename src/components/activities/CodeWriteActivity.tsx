@@ -60,7 +60,8 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
     return activity.starter || '';
   };
   
-  const [userCode, setUserCode] = useState(getInitialCode());
+  // Source of truth for student code
+  const [studentCode, setStudentCode] = useState(getInitialCode());
   const [hasExecuted, setHasExecuted] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -105,10 +106,19 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
       }
       
       setAvailableChips([...chips, ...distractors]);
-      // Clear selected chips when difficulty changes
+      // Clear selected chips and reset studentCode when difficulty changes
       setSelectedChips([]);
+      setStudentCode('');
     }
   }, [activity.id, difficulty]);
+
+  // Sync studentCode when chips change in organize mode
+  useEffect(() => {
+    if (mode === 'organize' && activity.id === 'double_print') {
+      const organizedCode = selectedChips.join('');
+      setStudentCode(organizedCode);
+    }
+  }, [selectedChips, mode, activity.id]);
 
   // Normalize text for validation
   const normalizeText = (text: string): string => {
@@ -160,13 +170,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
     setErrorMessage('');
     setStudentError('');
 
-    // If in organize mode, sync chips to code first
-    if (mode === 'organize') {
-      const organizedCode = selectedChips.join('');
-      setUserCode(organizedCode);
-    }
-
-    const codeToValidate = mode === 'organize' ? selectedChips.join('') : userCode;
+    const codeToValidate = studentCode;
 
     // Run the code and show output in terminal
     try {
@@ -275,6 +279,30 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
     setStudentError('');
   };
 
+  // Handle mode switching with proper synchronization
+  const handleModeSwitch = (newMode: 'type' | 'organize') => {
+    if (newMode === mode) return;
+
+    if (newMode === 'type') {
+      // When switching to type mode, studentCode is already synchronized
+      // Just clear chips for organize mode
+      setSelectedChips([]);
+    } else {
+      // When switching to organize mode, clear chips
+      // studentCode remains as is for potential reconstruction
+      setSelectedChips([]);
+    }
+    
+    setMode(newMode);
+    resetExecutionState();
+  };
+
+  // Handle student code changes in type mode
+  const handleStudentCodeChange = (code: string) => {
+    setStudentCode(code);
+    resetExecutionState();
+  };
+
   const renderExampleTerminal = () => {
     if (!activity.example?.code) return null;
     
@@ -347,194 +375,210 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
         </Card>
       ) : undefined}
     >
-      <div className="space-y-4">
-        {/* Mode Toggle (only for basic-03) */}
-        {activity.id === 'double_print' && availableChips.length > 0 && (
-          <div className="space-y-4">
-            <div className="flex justify-center">
-              <div className="bg-gray-700 rounded-lg p-1 flex">
-                <button
-                  onClick={() => {
-                    if (mode !== 'organize') {
-                      setSelectedChips([]);
-                      resetExecutionState();
-                    }
-                    setMode('organize');
-                  }}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                    mode === 'organize' 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'text-gray-300 hover:text-white'
-                  }`}
-                >
-                  Organizar palavras
-                </button>
-                <button
-                  onClick={() => {
-                    if (mode !== 'type') {
-                      const organizedCode = selectedChips.join('');
-                      setUserCode(organizedCode);
-                      resetExecutionState();
-                    }
-                    setMode('type');
-                  }}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                    mode === 'type' 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'text-gray-300 hover:text-white'
-                  }`}
-                >
-                  Digitar
-                </button>
-              </div>
-            </div>
-
-            {/* Difficulty selector for organize mode */}
-            {mode === 'organize' && (
-              <div className="flex justify-center">
-                <div className="bg-gray-800 rounded-lg p-1 flex gap-1">
-                  <button
-                    onClick={() => {
-                      setDifficulty('easy');
-                      resetExecutionState();
-                    }}
-                    className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
-                      difficulty === 'easy' 
-                        ? 'bg-green-600 text-white' 
-                        : 'text-gray-300 hover:text-white hover:bg-gray-700'
-                    }`}
-                  >
-                    Fácil
-                  </button>
-                  <button
-                    onClick={() => {
-                      setDifficulty('medium');
-                      resetExecutionState();
-                    }}
-                    className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
-                      difficulty === 'medium' 
-                        ? 'bg-yellow-600 text-white' 
-                        : 'text-gray-300 hover:text-white hover:bg-gray-700'
-                    }`}
-                  >
-                    Mais peças
-                  </button>
-                  <button
-                    onClick={() => {
-                      setDifficulty('challenge');
-                      resetExecutionState();
-                    }}
-                    className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
-                      difficulty === 'challenge' 
-                        ? 'bg-red-600 text-white' 
-                        : 'text-gray-300 hover:text-white hover:bg-gray-700'
-                    }`}
-                  >
-                    Modo desafio
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Organize Mode */}
-        {mode === 'organize' && activity.id === 'double_print' && (
-          <div className="space-y-4">
-            {/* Selected chips area */}
-            <div className="min-h-[80px] bg-gray-800 border border-gray-700 rounded-lg p-4">
-              <div className="text-xs text-gray-400 mb-2">Código montado:</div>
-              <div className="flex flex-wrap gap-2 min-h-[40px]">
-                {selectedChips.length > 0 ? (
-                  selectedChips.map((chip, index) => (
-                    <button
-                      key={index}
-                      onClick={() => removeChip(index)}
-                      className="inline-flex items-center px-3 py-1 rounded-md bg-primary text-primary-foreground text-sm hover:bg-primary/80 transition-colors"
-                    >
-                      {chip}
-                      <span className="ml-2 text-xs">×</span>
-                    </button>
-                  ))
-                ) : (
-                  <div className="text-gray-500 text-sm">Clique nas palavras abaixo para montar o código</div>
-                )}
-              </div>
-              {selectedChips.length > 0 && (
-                <button
-                  onClick={clearChips}
-                  className="mt-2 text-xs text-red-400 hover:text-red-300"
-                >
-                  Limpar tudo
-                </button>
-              )}
-            </div>
-
-            {/* Available chips */}
-            <div>
-              <div className="text-xs text-gray-400 mb-2">Arraste ou clique para organizar:</div>
-              <div className="flex flex-wrap gap-2">
-                {availableChips.map((chip, index) => (
-                  <button
-                    key={index}
-                    onClick={() => addChip(chip)}
-                    className="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-green-400 rounded-md text-sm font-mono transition-colors"
-                  >
-                    {chip}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Preview of organized code */}
-            <div className="bg-gray-900 border border-gray-700 rounded-lg p-3">
-              <div className="text-xs text-gray-400 mb-1">Prévia:</div>
-              <code className="text-green-400 font-mono text-sm">
-                {selectedChips.join('') || 'print("Olá, Commitinho")'}
-              </code>
-            </div>
-          </div>
-        )}
-
-        {/* Type Mode - Traditional textarea */}
-        {mode === 'type' && (
+      {/* Only show basic content for non-basic-03 activities */}
+      {activity.id !== 'double_print' && (
+        <div className="space-y-4">
           <textarea
-            value={userCode}
-            onChange={(e) => setUserCode(e.target.value)}
+            value={studentCode}
+            onChange={(e) => handleStudentCodeChange(e.target.value)}
             placeholder="Digite seu código aqui…"
             className="w-full bg-gray-800 text-green-400 font-mono leading-7 min-h-32 p-4 rounded-lg resize-none outline-none placeholder-green-600/50 border border-gray-700"
             disabled={hasExecuted && isCorrect}
             rows={6}
           />
-        )}
-
-      </div>
+        </div>
+      )}
     </ActivityShell>
 
-    {/* Student Terminal - Outside ActivityShell for proper layout */}
+    {/* Unified Student Terminal for basic-03 */}
     {activity.id === 'double_print' && (
       <div className="max-w-4xl mx-auto px-4 pb-8">
-        {/* Student Terminal (Editor) */}
+        {/* Single Student Terminal */}
         <div className="mb-4 rounded-xl border border-white/10 bg-[#0c0f1a]">
-          <div className="flex items-center gap-2 px-4 py-2 border-b border-white/10">
-            <div className="flex gap-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-red-500" />
-              <span className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
-              <span className="w-2.5 h-2.5 rounded-full bg-green-500" />
+          {/* Terminal Header with toggle */}
+          <div className="flex items-center justify-between px-4 py-2 border-b border-white/10">
+            <div className="flex items-center gap-2">
+              <div className="flex gap-1">
+                <span className="w-2.5 h-2.5 rounded-full bg-red-500" />
+                <span className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
+                <span className="w-2.5 h-2.5 rounded-full bg-green-500" />
+              </div>
+              <div className="ml-3 text-sm opacity-80 text-gray-300">Python Terminal (Seu código)</div>
             </div>
-            <div className="ml-3 text-sm opacity-80 text-gray-300">Python Terminal (Seu código)</div>
+
+            {/* Mode Toggle inside terminal header */}
+            <div className="bg-gray-800 rounded-md p-0.5 flex text-xs">
+              <button
+                onClick={() => handleModeSwitch('organize')}
+                className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                  mode === 'organize' 
+                    ? 'bg-primary text-primary-foreground' 
+                    : 'text-gray-300 hover:text-white'
+                }`}
+              >
+                Organizar palavras
+              </button>
+              <button
+                onClick={() => handleModeSwitch('type')}
+                className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                  mode === 'type' 
+                    ? 'bg-primary text-primary-foreground' 
+                    : 'text-gray-300 hover:text-white'
+                }`}
+              >
+                Digitar
+              </button>
+            </div>
           </div>
 
           <div className="p-4">
-            {/* Show current code */}
-            <pre className="rounded-lg bg-black/20 p-4 overflow-x-auto text-[#d1ffd1] text-sm font-mono min-h-[80px] flex items-center">
-              <code>
-{mode === 'organize' 
-  ? (selectedChips.length > 0 ? selectedChips.join('') : '# Monte o código usando as palavras acima')
-  : (userCode || '# Digite seu código aqui…')
-}
-              </code>
-            </pre>
+            {/* Organize Mode */}
+            {mode === 'organize' && (
+              <div className="space-y-4">
+                {/* Difficulty selector */}
+                <div className="flex justify-center">
+                  <div className="bg-gray-800 rounded-lg p-1 flex gap-1">
+                    <button
+                      onClick={() => {
+                        setDifficulty('easy');
+                        resetExecutionState();
+                      }}
+                      className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
+                        difficulty === 'easy' 
+                          ? 'bg-green-600 text-white' 
+                          : 'text-gray-300 hover:text-white hover:bg-gray-700'
+                      }`}
+                    >
+                      Fácil
+                    </button>
+                    <button
+                      onClick={() => {
+                        setDifficulty('medium');
+                        resetExecutionState();
+                      }}
+                      className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
+                        difficulty === 'medium' 
+                          ? 'bg-yellow-600 text-white' 
+                          : 'text-gray-300 hover:text-white hover:bg-gray-700'
+                      }`}
+                    >
+                      Mais peças
+                    </button>
+                    <button
+                      onClick={() => {
+                        setDifficulty('challenge');
+                        resetExecutionState();
+                      }}
+                      className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
+                        difficulty === 'challenge' 
+                          ? 'bg-red-600 text-white' 
+                          : 'text-gray-300 hover:text-white hover:bg-gray-700'
+                      }`}
+                    >
+                      Desafio
+                    </button>
+                  </div>
+                </div>
+
+                {/* Assembly line (dropzone) */}
+                <div className="bg-black/20 rounded-lg p-4 min-h-[80px]">
+                  <div className="text-xs text-gray-400 mb-2">Linha de montagem:</div>
+                  <div className="flex flex-wrap gap-2 min-h-[40px] items-center">
+                    {selectedChips.length > 0 ? (
+                      selectedChips.map((chip, index) => (
+                        <button
+                          key={index}
+                          onClick={() => removeChip(index)}
+                          className="inline-flex items-center px-2 py-1 rounded bg-primary text-primary-foreground text-sm font-mono hover:bg-primary/80 transition-colors"
+                        >
+                          {chip}
+                          <span className="ml-1 text-xs">×</span>
+                        </button>
+                      ))
+                    ) : (
+                      <div className="text-gray-500 text-sm font-mono">Clique nas palavras abaixo para montar</div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Final code display */}
+                <div className="bg-black/30 rounded-lg p-3">
+                  <div className="text-xs text-gray-400 mb-1">Código final:</div>
+                  <code className="text-[#d1ffd1] font-mono text-sm">
+                    {studentCode || 'print("Olá, Commitinho")'}
+                  </code>
+                </div>
+
+                {/* Available chips tray */}
+                <div className="bg-black/20 rounded-lg p-3">
+                  <div className="text-xs text-gray-400 mb-2">Bandeja de palavras:</div>
+                  <div className="flex gap-2 overflow-x-auto pb-2">
+                    {availableChips.map((chip, index) => (
+                      <button
+                        key={index}
+                        onClick={() => addChip(chip)}
+                        className="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-green-400 rounded-md text-sm font-mono transition-colors whitespace-nowrap"
+                      >
+                        {chip}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Type Mode */}
+            {mode === 'type' && (
+              <div className="space-y-4">
+                <textarea
+                  value={studentCode}
+                  onChange={(e) => handleStudentCodeChange(e.target.value)}
+                  placeholder="# Digite seu código aqui"
+                  className="w-full bg-black/20 text-[#d1ffd1] font-mono leading-7 min-h-32 p-4 rounded-lg resize-none outline-none placeholder-green-600/50 border-0"
+                  disabled={hasExecuted && isCorrect}
+                  rows={6}
+                />
+              </div>
+            )}
+
+            {/* Output Panel - Inside terminal, appears after execution */}
+            {hasExecutedOnce && (studentOutput || studentError) && (
+              <div className="mt-4 pt-4 border-t border-white/10">
+                <div className="bg-black/30 rounded-lg p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-xs opacity-60 text-gray-400">Saída do programa:</div>
+                    {studentOutput && isCorrect && (
+                      <button
+                        onClick={() => {
+                          try {
+                            const utterance = new SpeechSynthesisUtterance(studentOutput);
+                            utterance.lang = 'pt-BR';
+                            speechSynthesis.speak(utterance);
+                          } catch (e) {
+                            console.log('TTS not available');
+                          }
+                        }}
+                        className="text-xs px-2 py-1 bg-gray-600 hover:bg-gray-500 text-white rounded transition-colors"
+                        title="Ouvir saída"
+                      >
+                        🔊 Ouvir
+                      </button>
+                    )}
+                    {showConfetti && (
+                      <div className="text-lg animate-bounce">🎉</div>
+                    )}
+                  </div>
+                  <pre className="text-[#cde3ff] whitespace-pre-wrap text-sm font-mono min-h-[20px]">
+                    {studentOutput || " "}
+                  </pre>
+                  {studentError && (
+                    <pre className="mt-2 text-red-400 whitespace-pre-wrap text-sm font-mono">
+                      {studentError}
+                    </pre>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -559,57 +603,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
           </Button>
         </div>
 
-        {/* Output Panel - Appears after execution */}
-        {hasExecutedOnce && (studentOutput || studentError) && (
-          <div className="mt-6 rounded-xl border border-white/10 bg-[#0c0f1a]">
-            <div className="flex items-center gap-2 px-4 py-2 border-b border-white/10">
-              <div className="flex gap-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-red-500" />
-                <span className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
-                <span className="w-2.5 h-2.5 rounded-full bg-green-500" />
-              </div>
-              <div className="ml-3 text-sm opacity-80 text-gray-300">Saída do Programa</div>
-              {showConfetti && (
-                <div className="ml-auto text-2xl animate-bounce">🎉</div>
-              )}
-            </div>
-
-            <div className="p-4">
-              <div className="rounded-lg bg-black/30 p-3">
-                <div className="flex items-center justify-between mb-1">
-                  <div className="text-xs opacity-60 text-gray-400">Resultado</div>
-                  {studentOutput && isCorrect && (
-                    <button
-                      onClick={() => {
-                        try {
-                          const utterance = new SpeechSynthesisUtterance(studentOutput);
-                          utterance.lang = 'pt-BR';
-                          speechSynthesis.speak(utterance);
-                        } catch (e) {
-                          console.log('TTS not available');
-                        }
-                      }}
-                      className="text-xs px-2 py-1 bg-gray-600 hover:bg-gray-500 text-white rounded transition-colors"
-                      title="Ouvir saída"
-                    >
-                      🔊 Ouvir
-                    </button>
-                  )}
-                </div>
-                <pre className="text-[#cde3ff] whitespace-pre-wrap text-sm font-mono min-h-[20px]">
-                  {studentOutput || " "}
-                </pre>
-                {studentError && (
-                  <pre className="mt-2 text-red-400 whitespace-pre-wrap text-sm font-mono">
-                    {studentError}
-                  </pre>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Next Mission Button - Only after success */}
+        {/* Next Mission Button - Only after failure */}
         {hasExecutedOnce && !isCorrect && (
           <div className="flex justify-center mt-6">
             <div className="relative">
