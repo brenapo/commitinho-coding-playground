@@ -4,13 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Star, Play, Lock, RotateCcw, Trophy } from 'lucide-react';
+import { Star, Play, Lock, Trophy, Check } from 'lucide-react';
 import { UserProgress, SkillNode } from '@/types/progress';
 import { useSupabaseProgress } from '@/hooks/useSupabaseProgress';
-import { curriculum } from '@/data/curriculum';
+import { curriculum, basicAdventureWorld, basicAdventureLessons } from '@/data/curriculum';
 
 const Aventura = () => {
   const navigate = useNavigate();
+  const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
   const { 
     progress, 
     isLoading, 
@@ -27,6 +28,59 @@ const Aventura = () => {
     );
   }
 
+  // Basic Adventure helpers
+  useEffect(() => {
+    if (!progress) return;
+    const lastCompletedIndex = basicAdventureLessons.findLastIndex(lesson => 
+      (progress.stars[lesson.id] || 0) > 0
+    );
+    // If no lessons completed, start with lesson 0 (basic-01)
+    // If some completed, next lesson is lastCompletedIndex + 1
+    const nextIndex = lastCompletedIndex + 1;
+    setCurrentLessonIndex(Math.min(nextIndex, basicAdventureLessons.length - 1));
+  }, [progress]);
+
+  const handleBasicLessonClick = (lessonIndex: number) => {
+    const lesson = basicAdventureLessons[lessonIndex];
+    const isCompleted = (progress.stars[lesson.id] || 0) > 0;
+    const isCurrent = lessonIndex === currentLessonIndex;
+    const isFirstLesson = lessonIndex === 0;
+    
+    if (isCompleted || isCurrent || isFirstLesson) {
+      navigate(`/licao/${lesson.id}`);
+    }
+  };
+
+  const getBasicLessonStatus = (lessonIndex: number) => {
+    if (!progress) return 'locked';
+    
+    const lesson = basicAdventureLessons[lessonIndex];
+    const stars = progress.stars[lesson.id] || 0;
+    
+    if (stars > 0) return 'completed';
+    if (lessonIndex === 0) return 'current'; // First lesson always available
+    if (lessonIndex === currentLessonIndex) return 'current';
+    if (lessonIndex < currentLessonIndex) return 'available';
+    return 'locked';
+  };
+
+  const getTotalBasicStars = () => {
+    if (!progress) return 0;
+    return basicAdventureLessons.reduce((total, lesson) => 
+      total + (progress.stars[lesson.id] || 0), 0
+    );
+  };
+
+  const getCompletedBasicLessons = () => {
+    if (!progress) return 0;
+    return basicAdventureLessons.filter(lesson => (progress.stars[lesson.id] || 0) > 0).length;
+  };
+
+  const getBasicOverallProgress = () => {
+    return (getCompletedBasicLessons() / basicAdventureLessons.length) * 100;
+  };
+
+  // Original skills logic
   const currentWorld = curriculum.find(w => w.id === progress.world);
   if (!currentWorld) {
     return (
@@ -44,16 +98,14 @@ const Aventura = () => {
       return;
     }
 
-    // Find the next incomplete lesson in this skill
     const nextLesson = skill.lessons.find(lesson => {
       const lessonStars = progress.stars[lesson.id] || 0;
-      return lessonStars === 0; // Not completed yet
+      return lessonStars === 0;
     });
 
     if (nextLesson) {
       navigate(`/licao/${nextLesson.id}`);
     } else {
-      // All lessons completed, go to first lesson for review
       navigate(`/licao/${skill.lessons[0].id}`);
     }
   };
@@ -75,7 +127,6 @@ const Aventura = () => {
     if (!unlocked) return 'locked';
     if (completed) return 'completed';
     
-    // Check if any lesson has been started
     const hasProgress = skill.lessons.some(lesson => (progress.stars[lesson.id] || 0) > 0);
     return hasProgress ? 'in-progress' : 'available';
   };
@@ -88,9 +139,9 @@ const Aventura = () => {
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-3xl sm:text-4xl font-bold text-commitinho-text mb-2">
-                {currentWorld.title}
+                Aventura Commitinho
               </h1>
-              <p className="text-commitinho-text-soft">{currentWorld.description}</p>
+              <p className="text-commitinho-text-soft">Aprenda programação passo a passo!</p>
             </div>
             
             {/* Stats */}
@@ -138,9 +189,133 @@ const Aventura = () => {
         </div>
       </section>
 
-      {/* Skills Tree */}
+      {/* NEW: Basic Adventure Section */}
+      <section className="px-4 pb-12">
+        <div className="max-w-6xl mx-auto">
+          <Card className="bg-gradient-to-r from-commitinho-warning/10 to-commitinho-success/10 border-commitinho-warning/30 mb-8">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-2xl text-commitinho-text mb-2 flex items-center">
+                    🚀 {basicAdventureWorld.title}
+                  </CardTitle>
+                  <p className="text-commitinho-text-soft">{basicAdventureWorld.description}</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-commitinho-warning">{getTotalBasicStars()}</div>
+                  <div className="text-xs text-commitinho-text-soft">Estrelas</div>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {/* Progress Bar */}
+              <div className="mb-6">
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-commitinho-text-soft">Progresso: {getCompletedBasicLessons()}/10 lições</span>
+                  <span className="text-commitinho-text-soft">{Math.round(getBasicOverallProgress())}%</span>
+                </div>
+                <Progress value={getBasicOverallProgress()} className="h-3" />
+              </div>
+
+              {/* Lessons Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
+                {basicAdventureLessons.map((lesson, index) => {
+                  const status = getBasicLessonStatus(index);
+                  const stars = progress.stars[lesson.id] || 0;
+
+                  return (
+                    <Card
+                      key={lesson.id}
+                      className={`
+                        transition-all duration-300 cursor-pointer relative overflow-hidden
+                        ${status === 'locked' 
+                          ? 'bg-commitinho-surface/50 border-commitinho-surface-2/50 opacity-60' 
+                          : 'bg-commitinho-surface border-commitinho-surface-2 hover:shadow-glow-primary'
+                        }
+                        ${status === 'completed' ? 'ring-2 ring-commitinho-success' : ''}
+                        ${status === 'current' ? 'ring-2 ring-commitinho-warning animate-pulse' : ''}
+                      `}
+                      onClick={() => handleBasicLessonClick(index)}
+                    >
+                      <CardContent className="p-3 text-center">
+                        <div className={`
+                          w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center text-sm
+                          ${status === 'completed' ? 'bg-commitinho-success text-white' :
+                            status === 'current' ? 'bg-commitinho-warning text-white' :
+                            status === 'available' ? 'bg-primary text-white' :
+                            'bg-commitinho-surface-2 text-commitinho-text-soft'
+                          }
+                        `}>
+                          {status === 'locked' ? (
+                            <Lock className="h-4 w-4" />
+                          ) : status === 'completed' ? (
+                            <Check className="h-4 w-4" />
+                          ) : (
+                            index + 1
+                          )}
+                        </div>
+                        
+                        <div className="text-xs text-commitinho-text font-medium mb-1">
+                          Lição {index + 1}
+                        </div>
+                        
+                        {/* Stars */}
+                        <div className="flex justify-center space-x-1">
+                          {[1, 2, 3].map((starNum) => (
+                            <Star 
+                              key={starNum}
+                              className={`h-3 w-3 ${
+                                starNum <= stars 
+                                  ? 'fill-commitinho-warning text-commitinho-warning' 
+                                  : 'text-commitinho-surface-2'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+
+              {/* Action Button */}
+              <div className="text-center">
+                <Button
+                  size="lg"
+                  className="bg-gradient-arcade text-white font-semibold shadow-glow-primary hover:shadow-glow-secondary transition-all duration-300 mr-4"
+                  onClick={() => {
+                    // Always start with first lesson if no progress, otherwise continue with next
+                    const lessonIndex = getCompletedBasicLessons() === 0 ? 0 : currentLessonIndex;
+                    const nextLesson = basicAdventureLessons[lessonIndex];
+                    if (nextLesson) {
+                      navigate(`/licao/${nextLesson.id}`);
+                    }
+                  }}
+                >
+                  <Play className="mr-2 h-5 w-5" />
+                  {getCompletedBasicLessons() === 0 ? 'Começar Aventura Básica' : 'Continuar'}
+                </Button>
+
+                {/* Completion celebration */}
+                {getCompletedBasicLessons() === basicAdventureLessons.length && (
+                  <Badge className="bg-commitinho-success text-white px-4 py-2">
+                    🎉 Aventura Básica Completa! +{basicAdventureWorld.rewardXp} XP
+                  </Badge>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Original Skills Tree */}
       <section className="px-4 pb-16">
         <div className="max-w-4xl mx-auto">
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-commitinho-text mb-2">{currentWorld.title}</h2>
+            <p className="text-commitinho-text-soft">{currentWorld.description}</p>
+          </div>
+
           <div className="space-y-8">
             {currentWorld.skills.map((skill, index) => {
               const status = getSkillStatus(skill);
@@ -300,7 +475,7 @@ const Aventura = () => {
             })}
           </div>
 
-          {/* Continue/Practice button */}
+          {/* Continue/Practice button for original curriculum */}
           <div className="mt-12 text-center">
             <Button 
               size="lg"
@@ -313,7 +488,7 @@ const Aventura = () => {
               }}
             >
               <Play className="mr-2 h-5 w-5" />
-              Continuar Aventura
+              Continuar Currículo Avançado
             </Button>
           </div>
         </div>

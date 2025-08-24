@@ -1,29 +1,121 @@
 import { WorldData, LessonData } from '@/types/progress';
 
-// Lesson data for the curriculum
-export const lessons: Record<string, LessonData> = {
-  '1-1-1': {
-    id: '1-1-1',
-    world: 1,
+// Basic Adventure Lessons - focused on print()
+export const basicAdventureLessons: LessonData[] = [
+  {
+    id: 'basic-01',
+    world: 0,
     skill: 1,
     lesson: 1,
-    title: 'Primeiros Passos',
-    description: 'Aprenda a dar comandos simples para o Commitinho se mover.',
-    concept: 'Sequência',
+    title: 'Primeira palavra',
+    description: 'Complete o print escolhendo uma palavra. Qualquer uma funciona!',
+    concept: 'Print básico',
     xp_reward: 10,
     required_accuracy: 60
   },
-  'lesson-2': {
-    id: 'lesson-2',
-    world: 1,
+  {
+    id: 'basic-02',
+    world: 0,
     skill: 1,
     lesson: 2,
-    title: 'Guardando palavras em uma caixinha (variáveis)',
-    description: 'Aprenda a guardar valores em variáveis e recuperá-los.',
-    concept: 'Variáveis',
+    title: 'Frutas falantes',
+    description: 'Faça o computador falar o nome de uma fruta deliciosa!',
+    concept: 'Print básico',
+    xp_reward: 10,
+    required_accuracy: 60
+  },
+  {
+    id: 'basic-03',
+    world: 0,
+    skill: 1,
+    lesson: 3,
+    title: 'Dupla de frases',
+    description: 'Agora vamos usar dois prints seguidos.',
+    concept: 'Print múltiplo',
+    xp_reward: 12,
+    required_accuracy: 60
+  },
+  {
+    id: 'basic-04',
+    world: 0,
+    skill: 1,
+    lesson: 4,
+    title: 'Eco 3x',
+    description: 'Vamos fazer eco três vezes seguidas!',
+    concept: 'Print múltiplo',
+    xp_reward: 12,
+    required_accuracy: 60
+  },
+  {
+    id: 'basic-05',
+    world: 0,
+    skill: 1,
+    lesson: 5,
+    title: 'História engraçada',
+    description: 'Crie uma mini história com 3 linhas!',
+    concept: 'Print livre',
+    xp_reward: 14,
+    required_accuracy: 60
+  },
+  {
+    id: 'basic-06',
+    world: 0,
+    skill: 1,
+    lesson: 6,
+    title: 'Show de emojis',
+    description: 'Escolha um emoji especial para mostrar!',
+    concept: 'Print básico',
+    xp_reward: 10,
+    required_accuracy: 60
+  },
+  {
+    id: 'basic-07',
+    world: 0,
+    skill: 1,
+    lesson: 7,
+    title: 'Mensagem secreta',
+    description: 'Hora de revelar o segredo especial!',
+    concept: 'Print específico',
+    xp_reward: 12,
+    required_accuracy: 60
+  },
+  {
+    id: 'basic-08',
+    world: 0,
+    skill: 1,
+    lesson: 8,
+    title: 'Aviso de robô',
+    description: 'O robô precisa avisar que está acordado!',
+    concept: 'Print específico',
+    xp_reward: 12,
+    required_accuracy: 60
+  },
+  {
+    id: 'basic-09',
+    world: 0,
+    skill: 1,
+    lesson: 9,
+    title: 'Cartaz divertido',
+    description: 'Crie um cartaz com 4 linhas bem legais!',
+    concept: 'Print livre',
     xp_reward: 15,
     required_accuracy: 60
   },
+  {
+    id: 'basic-10',
+    world: 0,
+    skill: 1,
+    lesson: 10,
+    title: 'Grande Final: O Show do Commitinho',
+    description: 'Crie um mini show com 5 linhas usando print.',
+    concept: 'Print livre',
+    xp_reward: 20,
+    required_accuracy: 60
+  }
+];
+
+// Lesson data for the curriculum
+export const lessons: Record<string, LessonData> = {
   '1-1-2': {
     id: '1-1-2',
     world: 1,
@@ -114,6 +206,18 @@ export const lessons: Record<string, LessonData> = {
   }
 };
 
+// Basic Adventure World
+export const basicAdventureWorld = {
+  id: "basic-adventure",
+  title: "Aventura Básica",
+  description: "Fazendo o computador falar com print().",
+  lessons: [
+    "basic-01", "basic-02", "basic-03", "basic-04", "basic-05",
+    "basic-06", "basic-07", "basic-08", "basic-09", "basic-10"
+  ],
+  rewardXp: 50
+};
+
 // World and skill structure
 export const curriculum: WorldData[] = [
   {
@@ -128,11 +232,11 @@ export const curriculum: WorldData[] = [
         skill: 1,
         title: 'Sequência',
         concept: 'Comandos em ordem',
-        lessons: [lessons['1-1-1'], lessons['1-1-2'], lessons['1-1-3']],
+        lessons: [lessons['1-1-2'], lessons['1-1-3']],
         unlocked: true,
         completed: false,
         totalStars: 0,
-        maxStars: 9
+        maxStars: 6
       },
       {
         id: '1-2',

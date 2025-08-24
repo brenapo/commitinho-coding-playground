@@ -36,8 +36,8 @@ const Index = () => {
         navigate('/aventura');
       }
     } else {
-      // First time - start from lesson 1
-      navigate('/licao/1-1-1');
+      // First time - start from basic adventure lesson 1
+      navigate('/licao/basic-01');
     }
   };
 

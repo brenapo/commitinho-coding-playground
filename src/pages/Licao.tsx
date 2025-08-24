@@ -1,45 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Star, ArrowLeft, CheckCircle, Play, Code } from 'lucide-react';
+import { ArrowLeft, Star } from 'lucide-react';
 import { LessonData } from '@/types/progress';
 import { useSupabaseProgress } from '@/hooks/useSupabaseProgress';
-import { getLessonById } from '@/data/curriculum';
+import { basicAdventureLessons, getLessonById } from '@/data/curriculum';
 import { lesson1Data } from '@/data/lessons/lesson-1';
 import { lesson2Data } from '@/data/lessons/lesson-2';
-
-interface ActivityData {
-  id: string;
-  type: string;
-  title: string;
-  prompt: string;
-  starter: string;
-  solutions: string[];
-  choices: string[];
-  successTemplate?: string;
-  explain: string;
-  commit_label: string;
-  next?: string;
-  xp: number;
-}
-
-interface LessonContent {
-  id: string;
-  title: string;
-  intro: {
-    image: string;
-    title: string;
-    text: string;
-    cta: {
-      label: string;
-      goto: string;
-    };
-  };
-  activities: ActivityData[];
-}
+import CodeFillActivity from '@/components/activities/CodeFillActivity';
+import CodeWriteActivity from '@/components/activities/CodeWriteActivity';
+import CodeFreeActivity from '@/components/activities/CodeFreeActivity';
 
 const Licao = () => {
   const { lessonId } = useParams<{ lessonId: string }>();
@@ -52,12 +24,7 @@ const Licao = () => {
   } = useSupabaseProgress();
   
   const [lesson, setLesson] = useState<LessonData | null>(null);
-  const [lessonContent, setLessonContent] = useState<LessonContent | null>(null);
-  const [selectedChoice, setSelectedChoice] = useState<string>('');
-  const [hasExecuted, setHasExecuted] = useState(false);
-  const [isCorrect, setIsCorrect] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string>('');
+  const [lessonContent, setLessonContent] = useState<any>(null);
 
   useEffect(() => {
     if (!lessonId) {
@@ -65,7 +32,17 @@ const Licao = () => {
       return;
     }
 
-    const lessonData = getLessonById(lessonId);
+    // Reset lesson content first to show loading state
+    setLessonContent(null);
+    setLesson(null);
+
+    // Check if it's a basic adventure lesson
+    let lessonData;
+    if (lessonId.startsWith('basic-')) {
+      lessonData = basicAdventureLessons.find(l => l.id === lessonId);
+    } else {
+      lessonData = getLessonById(lessonId);
+    }
 
     if (!lessonData) {
       navigate('/aventura');
@@ -74,25 +51,26 @@ const Licao = () => {
 
     setLesson(lessonData);
     
-    // Reset all activity state when lesson changes
-    setSelectedChoice('');
-    setHasExecuted(false);
-    setIsCorrect(false);
-    setShowSuccessModal(false);
-    setSuccessMessage('');
-    
-    // Load lesson content from imported data
-    const loadLessonContent = () => {
+    // Load lesson content
+    const loadLessonContent = async () => {
       try {
         console.log(`🔍 Loading lesson content for: ${lessonId}`);
         
-        let content: LessonContent;
+        let content;
         
-        // Map lessonId to imported data
-        if (lessonId === '1-1-1') {
-          content = lesson1Data as LessonContent;
+        // Check if it's a basic adventure lesson
+        if (lessonId?.startsWith('basic-')) {
+          try {
+            const lessonModule = await import(`@/data/lessons/basic/${lessonId}.ts`);
+            content = lessonModule.lessonData;
+          } catch (importError) {
+            console.error(`Failed to import basic lesson ${lessonId}:`, importError);
+            throw new Error(`No lesson data found for: ${lessonId}`);
+          }
+        } else if (lessonId === '1-1-1') {
+          content = lesson1Data;
         } else if (lessonId === 'lesson-2') {
-          content = lesson2Data as LessonContent;
+          content = lesson2Data;
         } else {
           throw new Error(`No lesson data found for: ${lessonId}`);
         }
@@ -107,6 +85,30 @@ const Licao = () => {
     loadLessonContent();
   }, [lessonId, navigate]);
 
+  const handleActivityComplete = (xp: number) => {
+    if (!lesson) return;
+    
+    console.log(`🎉 Activity completed! XP: ${xp}`);
+    completeLessonProgress(lesson, 100);
+    
+    // Add a small delay to ensure state updates are processed
+    setTimeout(() => {
+      // Navigate to next lesson or back to adventure
+      const currentIndex = basicAdventureLessons.findIndex(l => l.id === lessonId);
+      if (currentIndex >= 0 && currentIndex < basicAdventureLessons.length - 1) {
+        const nextLesson = basicAdventureLessons[currentIndex + 1];
+        console.log(`🚀 Navigating to next lesson: ${nextLesson.id}`);
+        navigate(`/licao/${nextLesson.id}`, { replace: true });
+      } else if (lessonContent?.next) {
+        console.log(`🚀 Navigating to specified next lesson: ${lessonContent.next}`);
+        navigate(`/licao/${lessonContent.next}`, { replace: true });
+      } else {
+        console.log(`🏠 Navigating back to adventure`);
+        navigate('/aventura', { replace: true });
+      }
+    }, 100);
+  };
+
   if (isLoading || !progress || !lesson) {
     return (
       <div className="min-h-screen bg-commitinho-bg flex items-center justify-center">
@@ -115,83 +117,42 @@ const Licao = () => {
     );
   }
 
-  const renderSuccess = (template: string, userAnswer: string) => {
-    const clean = userAnswer.replace(/^"|"$/g, "");
-    return template.replace(/\{\{\s*answer\s*\}\}/g, clean);
-  };
-
-  const handleChoiceSelect = (choice: string) => {
-    if (!hasExecuted) {
-      setSelectedChoice(choice);
-    }
-  };
-
-  const handleExecute = () => {
-    if (!selectedChoice || !lessonContent) return;
-
-    const activity = lessonContent.activities[0];
-    if (!activity) return;
-
-    const correct = activity.solutions.includes(selectedChoice);
-    setIsCorrect(correct);
-    setHasExecuted(true);
-    
-    if (correct) {
-      const message = activity.successTemplate 
-        ? renderSuccess(activity.successTemplate, selectedChoice)
-        : `Correto! ${selectedChoice}`;
-      setSuccessMessage(message);
-      setShowSuccessModal(true);
-    }
-  };
-
-  const handleLessonComplete = () => {
-    console.log('🔥 handleLessonComplete called');
-    console.log('📚 lesson:', lesson);
-    console.log('📖 lessonContent:', lessonContent);
-    
-    if (!lesson || !lessonContent) {
-      console.log('❌ Missing lesson or lessonContent');
-      return;
-    }
-    
-    const activity = lessonContent.activities[0];
-    console.log('🎯 activity:', activity);
-    console.log('➡️ activity.next:', activity?.next);
-    
-    completeLessonProgress(lesson, 100);
-    setShowSuccessModal(false);
-    
-    if (activity?.next) {
-      console.log(`🚀 Navigating to: /licao/${activity.next}`);
-      navigate(`/licao/${activity.next}`);
-    } else {
-      console.log('🏠 Navigating to: /aventura');
-      navigate('/aventura');
-    }
-  };
-
-  const getDisplayCode = () => {
-    if (!lessonContent) return '';
-    const activity = lessonContent.activities[0];
-    if (!activity) return '';
-    
-    if (selectedChoice) {
-      return activity.starter.replace('____', selectedChoice);
-    }
-    return activity.starter;
-  };
-
   if (!lessonContent) {
-    return null;
+    return (
+      <div className="min-h-screen bg-commitinho-bg flex items-center justify-center">
+        <div className="text-commitinho-text">Carregando lição...</div>
+      </div>
+    );
   }
 
-  const activity = lessonContent.activities[0];
+  const activity = lessonContent.activities?.[0];
   if (!activity) {
-    return <div>Atividade não encontrada</div>;
+    return (
+      <div className="min-h-screen bg-commitinho-bg flex items-center justify-center">
+        <div className="text-commitinho-text">Atividade não encontrada</div>
+      </div>
+    );
   }
 
   const currentStars = progress?.stars[lesson?.id || ''] || 0;
+
+  const renderActivity = () => {
+    const commonProps = {
+      activity,
+      onComplete: handleActivityComplete
+    };
+
+    switch (activity.type) {
+      case 'code_fill':
+        return <CodeFillActivity {...commonProps} />;
+      case 'code_write':
+        return <CodeWriteActivity {...commonProps} />;
+      case 'code_free':
+        return <CodeFreeActivity {...commonProps} />;
+      default:
+        return <div>Tipo de atividade não suportado: {activity.type}</div>;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-commitinho-bg">
@@ -210,7 +171,7 @@ const Licao = () => {
 
             <div className="text-center flex-1 px-4">
               <Badge className="bg-primary text-primary-foreground mb-1 sm:mb-2 text-xs">
-                {lesson?.concept || 'Conceito'}
+                {lesson?.concept || 'Print'}
               </Badge>
               <h1 className="text-sm sm:text-xl font-bold text-commitinho-text leading-tight">
                 {lesson?.title || lessonContent.title}
@@ -234,10 +195,9 @@ const Licao = () => {
         </div>
       </section>
 
-      {/* Single Screen Content */}
-      <section className="px-4 py-6 sm:py-8">
-        <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
-          {/* Commitinho Header Explanation */}
+      {/* Lesson Intro */}
+      {lessonContent.intro && (
+        <section className="px-4 py-6">
           <div className="max-w-2xl mx-auto">
             <div className="flex items-start gap-3 sm:gap-4">
               <img 
@@ -256,136 +216,15 @@ const Licao = () => {
               </div>
             </div>
           </div>
+        </section>
+      )}
 
-          {/* Activity Card */}
-          <Card className="bg-commitinho-surface border-commitinho-surface-2">
-            <CardHeader className="p-4 sm:p-6">
-              <CardTitle className="text-commitinho-text flex items-center text-base sm:text-lg">
-                <Code className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                {activity.title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6 pt-0">
-              <div className="text-commitinho-text-soft text-sm sm:text-base" dangerouslySetInnerHTML={{ __html: activity.prompt }} />
-
-              {/* Code Editor */}
-              <div className="bg-gray-900 text-green-400 p-3 sm:p-4 rounded-lg font-mono text-sm sm:text-lg border-2 border-gray-700 overflow-x-auto">
-                <div className="flex items-center mb-2">
-                  <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-red-500 mr-1 sm:mr-2"></div>
-                  <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-yellow-500 mr-1 sm:mr-2"></div>
-                  <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-green-500 mr-1 sm:mr-2"></div>
-                  <span className="text-gray-400 text-xs sm:text-sm ml-2">Python Terminal</span>
-                </div>
-                <pre className="block whitespace-pre-wrap"><code>{getDisplayCode()}</code></pre>
-                {hasExecuted && isCorrect && (
-                  <div className="mt-2 text-white">
-                    <span className="text-gray-400">{'> '}</span>
-                    {selectedChoice}
-                  </div>
-                )}
-              </div>
-
-              {/* Choices */}
-              <div className="space-y-2 sm:space-y-3">
-                <h4 className="text-commitinho-text font-medium text-sm sm:text-base">
-                  Escolha o que vai dentro das aspas:
-                </h4>
-                {activity.choices.map((choice, index) => (
-                  <Button
-                    key={index}
-                    onClick={() => handleChoiceSelect(choice)}
-                    variant={selectedChoice === choice ? "default" : "outline"}
-                    className={`w-full justify-start text-left h-auto p-3 sm:p-4 text-sm sm:text-base ${
-                      selectedChoice === choice 
-                        ? "bg-primary text-primary-foreground" 
-                        : "border-commitinho-surface-2 text-commitinho-text hover:bg-commitinho-surface-2"
-                    }`}
-                    disabled={hasExecuted}
-                  >
-                    "{choice}"
-                  </Button>
-                ))}
-              </div>
-
-              {/* Execute Button */}
-              {!hasExecuted && (
-                <div className="text-center">
-                  <Button
-                    onClick={handleExecute}
-                    disabled={!selectedChoice}
-                    size="lg"
-                    className="w-full sm:w-auto bg-gradient-arcade text-white font-semibold shadow-glow-primary hover:shadow-glow-secondary transition-all duration-300 text-sm sm:text-base px-6 sm:px-8 py-3 sm:py-4"
-                  >
-                    <Play className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                    Executar
-                  </Button>
-                </div>
-              )}
-
-              {/* Wrong Answer Feedback */}
-              {hasExecuted && !isCorrect && (
-                <Card className="bg-red-500/10 border-red-500">
-                  <CardContent className="p-4 sm:p-6 text-center">
-                    <div className="text-3xl sm:text-4xl mb-3">❌</div>
-                    <h3 className="text-base sm:text-lg font-bold text-red-600 mb-2">
-                      Ops! Tente novamente
-                    </h3>
-                    <p className="text-commitinho-text-soft mb-4 text-sm sm:text-base">
-                      Essa não é a resposta correta. Tente escolher outra opção!
-                    </p>
-                    <Button
-                      onClick={() => {
-                        setSelectedChoice('');
-                        setHasExecuted(false);
-                        setIsCorrect(false);
-                      }}
-                      variant="outline"
-                      className="w-full sm:w-auto border-commitinho-surface-2 text-commitinho-text hover:bg-commitinho-surface-2 text-sm sm:text-base"
-                    >
-                      Tentar Novamente
-                    </Button>
-                  </CardContent>
-                </Card>
-              )}
-            </CardContent>
-          </Card>
+      {/* Activity */}
+      <section className="px-4 pb-16">
+        <div className="max-w-4xl mx-auto">
+          {renderActivity()}
         </div>
       </section>
-
-      {/* Success Modal */}
-      <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
-        <DialogContent className="max-w-md mx-4">
-          <DialogHeader>
-            <DialogTitle className="text-center">
-              <div className="text-4xl sm:text-6xl mb-4">🎉</div>
-              <div className="text-lg sm:text-xl font-bold text-commitinho-success" dangerouslySetInnerHTML={{ __html: successMessage }} />
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3 sm:space-y-4 text-center">
-            <div className="bg-commitinho-surface p-3 sm:p-4 rounded-lg">
-              <div className="text-commitinho-text-soft text-xs sm:text-sm" dangerouslySetInnerHTML={{ __html: activity.explain }} />
-            </div>
-            
-            <div className="bg-commitinho-warning/10 p-3 rounded-lg">
-              <div className="flex items-center justify-center gap-2 sm:gap-3">
-                <span className="text-commitinho-text font-medium text-sm sm:text-base">XP Ganho:</span>
-                <Badge className="bg-commitinho-warning text-commitinho-warning-foreground text-xs sm:text-sm">
-                  +{activity.xp} XP
-                </Badge>
-              </div>
-            </div>
-
-            <Button
-              onClick={handleLessonComplete}
-              size="lg"
-              className="w-full bg-gradient-arcade text-white font-semibold shadow-glow-primary hover:shadow-glow-secondary transition-all duration-300 text-sm sm:text-base px-6 sm:px-8 py-3 sm:py-4"
-            >
-              <CheckCircle className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-              {activity.commit_label}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
