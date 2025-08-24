@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Play, CheckCircle, Code } from 'lucide-react';
 import ActivityShell from './ActivityShell';
 import SuccessModal from '@/components/ui/SuccessModal';
+import ErrorModal from '@/components/ui/ErrorModal';
 
 interface CodeFillActivityProps {
   activity: {
@@ -33,6 +34,7 @@ const CodeFillActivity: React.FC<CodeFillActivityProps> = ({ activity, onComplet
   const [showFeedback, setShowFeedback] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string>('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
 
   const handleChoiceSelect = (choice: string) => {
     if (!hasExecuted) {
@@ -60,13 +62,21 @@ const CodeFillActivity: React.FC<CodeFillActivityProps> = ({ activity, onComplet
       setSuccessMessage(message);
       setShowSuccessModal(true);
     } else {
-      setShowFeedback(true);
+      setShowErrorModal(true);
     }
   };
 
   const handleNext = () => {
     setShowSuccessModal(false);
     onComplete(activity.xp);
+  };
+
+  const handleTryAgain = () => {
+    setSelectedChoice('');
+    setHasExecuted(false);
+    setShowFeedback(false);
+    setIsCorrect(false);
+    setShowErrorModal(false);
   };
 
   const getDisplayCode = () => {
@@ -85,31 +95,6 @@ const CodeFillActivity: React.FC<CodeFillActivityProps> = ({ activity, onComplet
       prompt={activity.prompt}
       onRun={!hasExecuted ? handleExecute : undefined}
       runLabel={activity.runLabel || "Executar"}
-      feedback={showFeedback && !isCorrect ? (
-        <Card className="bg-red-500/10 border-red-500 max-w-lg mx-auto">
-          <CardContent className="p-6 text-center">
-            <div className="text-4xl mb-3">❌</div>
-            <h3 className="text-lg font-bold text-red-600 mb-2">
-              Ops! Tente novamente
-            </h3>
-            <p className="text-commitinho-text-soft mb-4">
-              Essa não é a resposta correta. Tente escolher outra opção!
-            </p>
-            <Button
-              onClick={() => {
-                setSelectedChoice('');
-                setHasExecuted(false);
-                setShowFeedback(false);
-                setIsCorrect(false);
-              }}
-              variant="outline"
-              className="border-commitinho-surface-2 text-commitinho-text hover:bg-commitinho-surface-2"
-            >
-              Tentar Novamente
-            </Button>
-          </CardContent>
-        </Card>
-      ) : undefined}
     >
       <div className="space-y-4">
         {/* Code Display */}
@@ -152,6 +137,15 @@ const CodeFillActivity: React.FC<CodeFillActivityProps> = ({ activity, onComplet
       xp={activity.xp}
       explanation={activity.successExplain || "Parabéns! Você completou a atividade!"}
       onNext={handleNext}
+    />
+
+    {/* Error Modal */}
+    <ErrorModal
+      open={showErrorModal}
+      onOpenChange={setShowErrorModal}
+      title="Ops! Tente novamente"
+      message="Essa não é a resposta correta. Tente escolher outra opção!"
+      onTryAgain={handleTryAgain}
     />
   </>
   );

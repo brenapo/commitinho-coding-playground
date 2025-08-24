@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Play, CheckCircle } from 'lucide-react';
 import ActivityShell from './ActivityShell';
 import SuccessModal from '@/components/ui/SuccessModal';
+import ErrorModal from '@/components/ui/ErrorModal';
 
 type ExampleBlock = {
   code: string;        // código de exemplo read-only
@@ -67,6 +68,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
   
   // Student execution terminal states
   const [studentOutput, setStudentOutput] = useState('');
@@ -168,6 +170,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
         if (output.length !== 1) {
           setIsCorrect(false);
           setErrorMessage('Deve haver exatamente uma linha de saída. Verifique se há apenas um print.');
+          setShowErrorModal(true);
           return;
         }
 
@@ -191,6 +194,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
         } else {
           setIsCorrect(false);
           setErrorMessage(`Esperado algo como "Olá, Commitinho". Recebido: "${output[0]}"`);
+          setShowErrorModal(true);
         }
       }
       // Fallback to original validation for other activities
@@ -207,6 +211,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
         } else {
           setIsCorrect(false);
           setErrorMessage(`Esperado: ${activity.expectedOutput.join(', ')}. Recebido: ${output.join(', ')}`);
+          setShowErrorModal(true);
         }
       }
       // Validate using regex
@@ -222,11 +227,40 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
         } else {
           setIsCorrect(false);
           setErrorMessage('O código não está no formato esperado. Verifique se está seguindo o padrão solicitado.');
+          setShowErrorModal(true);
         }
       }
     } catch (error) {
       setStudentError('Erro ao executar o código');
       setIsCorrect(false);
+      setErrorMessage('Erro ao executar o código. Verifique se está no formato correto.');
+      setShowErrorModal(true);
+    }
+  };
+
+  // Complete reset function for "Try Again"
+  const handleTryAgain = () => {
+    setHasExecuted(false);
+    setHasExecutedOnce(false);
+    setIsCorrect(false);
+    setErrorMessage('');
+    setSuccessMessage('');
+    setStudentOutput('');
+    setStudentError('');
+    setShowConfetti(false);
+    setShowErrorModal(false);
+    setShowSuccessModal(false);
+    
+    // Reset code and chips for basic-03
+    if (activity.id === 'double_print') {
+      setSelectedChips([]);
+      setStudentCode('');
+      // Re-shuffle the chips
+      const chips = ['print', '(', '"Olá, Commitinho"', ')'];
+      const shuffled = [...chips].sort(() => Math.random() - 0.5);
+      setAvailableChips(shuffled);
+    } else {
+      setStudentCode(getInitialCode());
     }
   };
 
@@ -344,26 +378,6 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
       explain={activity.explain}
       prompt={activity.prompt}
       exampleTerminal={renderExampleTerminal()}
-      feedback={hasExecuted && !isCorrect ? (
-        <Card className="bg-red-500/10 border-red-500 max-w-lg mx-auto">
-          <CardContent className="p-6 text-center">
-            <div className="text-4xl mb-3">❌</div>
-            <h3 className="text-lg font-bold text-red-600 mb-2">
-              Ops! Vamos tentar de novo
-            </h3>
-            <p className="text-commitinho-text-soft mb-4">
-              {errorMessage}
-            </p>
-            <Button
-              onClick={handleReset}
-              variant="outline"
-              className="border-commitinho-surface-2 text-commitinho-text hover:bg-commitinho-surface-2"
-            >
-              Tentar Novamente
-            </Button>
-          </CardContent>
-        </Card>
-      ) : undefined}
     >
       {/* Unified Student Terminal for basic-03 - Inside ActivityShell */}
       {activity.id === 'double_print' ? (
@@ -574,6 +588,15 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
       xp={activity.xp}
       explanation={activity.successExplain || "Parabéns! Você completou a atividade!"}
       onNext={handleComplete}
+    />
+
+    {/* Error Modal */}
+    <ErrorModal
+      open={showErrorModal}
+      onOpenChange={setShowErrorModal}
+      title="Ops! Vamos tentar de novo"
+      message={errorMessage}
+      onTryAgain={handleTryAgain}
     />
   </>
   );
