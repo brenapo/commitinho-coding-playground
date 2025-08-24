@@ -89,7 +89,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
   const [availableChips, setAvailableChips] = useState<string[]>([]);
   const [hasExecutedOnce, setHasExecutedOnce] = useState(false);
 
-  // Initialize and shuffle chips for basic-03
+  // Initialize and shuffle chips for basic-03 and basic-04
   useEffect(() => {
     if (activity.id === 'double_print') {
       // Use simple set of chips - just shuffled
@@ -97,13 +97,29 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
       // Shuffle the chips so they're not in correct order
       const shuffled = [...chips].sort(() => Math.random() - 0.5);
       setAvailableChips(shuffled);
+    } else if (activity.id === 'triple_echo') {
+      // Basic-04: Echo exercise with multiple difficulty levels
+      const chips = ['print("eco")', 'print("eco")', 'print("eco")'];
+      // Add some distractors
+      const distractors = ['"Ecooo!"', '"eco?"'];
+      const allChips = [...chips, ...distractors];
+      // Shuffle the chips
+      const shuffled = allChips.sort(() => Math.random() - 0.5);
+      setAvailableChips(shuffled);
     }
   }, [activity.id]);
 
   // Sync studentCode when chips change in organize mode
   useEffect(() => {
-    if (mode === 'organize' && activity.id === 'double_print') {
-      const organizedCode = selectedChips.join('');
+    if (mode === 'organize' && (activity.id === 'double_print' || activity.id === 'triple_echo')) {
+      let organizedCode;
+      if (activity.id === 'triple_echo') {
+        // For echo exercise, join non-empty chips with newlines
+        organizedCode = selectedChips.filter(chip => chip && chip.trim()).join('\n');
+      } else {
+        // For greeting exercise, join chips without spaces
+        organizedCode = selectedChips.join('');
+      }
       setStudentCode(organizedCode);
     }
   }, [selectedChips, mode, activity.id]);
@@ -197,6 +213,54 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
           setShowErrorModal(true);
         }
       }
+      // Enhanced validation for basic-04 (triple echo)
+      else if (activity.id === 'triple_echo') {
+        if (output.length < 3) {
+          setIsCorrect(false);
+          const missing = 3 - output.length;
+          setErrorMessage(`A caverna está tímida… falta${missing > 1 ? 'm' : ''} ${missing} eco${missing > 1 ? 's' : ''}!`);
+          setShowErrorModal(true);
+          return;
+        } else if (output.length > 3) {
+          setIsCorrect(false);
+          setErrorMessage('Muitos gritos! Use só 3 ecos.');
+          setShowErrorModal(true);
+          return;
+        }
+
+        // Check each line - should be exactly "eco" (case-insensitive, spaces ok)
+        const validEchos = output.every(line => {
+          const normalized = normalizeText(line);
+          return /^eco\s*$/.test(normalized);
+        });
+
+        if (validEchos) {
+          setIsCorrect(true);
+          
+          // Show confetti animation on successful execution
+          setShowConfetti(true);
+          setTimeout(() => setShowConfetti(false), 3000);
+          
+          const message = activity.successTemplate || 'Perfeito! Os três ecos voltaram!';
+          setSuccessMessage(message);
+          
+          // Don't show success modal immediately, let user click next mission
+        } else {
+          setIsCorrect(false);
+          // Check what kind of error
+          const hasWrongWords = output.some(line => {
+            const normalized = normalizeText(line);
+            return normalized.includes('ecooo') || normalized.includes('eco?');
+          });
+          
+          if (hasWrongWords) {
+            setErrorMessage('O eco volta igualzinho: escreva apenas "eco".');
+          } else {
+            setErrorMessage('Use print("eco") — as aspas e os parênteses fazem a mágica.');
+          }
+          setShowErrorModal(true);
+        }
+      }
       // Fallback to original validation for other activities
       else if (activity.expectedOutput) {
         // Check if output matches expected
@@ -251,13 +315,22 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
     setShowErrorModal(false);
     setShowSuccessModal(false);
     
-    // Reset code and chips for basic-03
+    // Reset code and chips for exercises with organize mode
     if (activity.id === 'double_print') {
       setSelectedChips([]);
       setStudentCode('');
       // Re-shuffle the chips
       const chips = ['print', '(', '"Olá, Commitinho"', ')'];
       const shuffled = [...chips].sort(() => Math.random() - 0.5);
+      setAvailableChips(shuffled);
+    } else if (activity.id === 'triple_echo') {
+      setSelectedChips([]);
+      setStudentCode('');
+      // Re-shuffle the chips
+      const chips = ['print("eco")', 'print("eco")', 'print("eco")'];
+      const distractors = ['"Ecooo!"', '"eco?"'];
+      const allChips = [...chips, ...distractors];
+      const shuffled = allChips.sort(() => Math.random() - 0.5);
       setAvailableChips(shuffled);
     } else {
       setStudentCode(getInitialCode());
@@ -278,11 +351,36 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
 
   // Chip management functions
   const addChip = (chip: string) => {
-    setSelectedChips(prev => [...prev, chip]);
+    if (activity.id === 'triple_echo') {
+      // For triple echo, add to the first empty slot
+      setSelectedChips(prev => {
+        const newChips = [...prev];
+        for (let i = 0; i < 3; i++) {
+          if (!newChips[i]) {
+            newChips[i] = chip;
+            break;
+          }
+        }
+        return newChips;
+      });
+    } else {
+      // For other exercises, add to the end
+      setSelectedChips(prev => [...prev, chip]);
+    }
   };
 
   const removeChip = (index: number) => {
-    setSelectedChips(prev => prev.filter((_, i) => i !== index));
+    if (activity.id === 'triple_echo') {
+      // For triple echo, clear the specific slot but maintain array structure
+      setSelectedChips(prev => {
+        const newChips = [...prev];
+        newChips[index] = '';
+        return newChips;
+      });
+    } else {
+      // For other exercises, remove by index
+      setSelectedChips(prev => prev.filter((_, i) => i !== index));
+    }
   };
 
   const clearChips = () => {
@@ -365,6 +463,13 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
               </pre>
             )}
           </div>
+          
+          {/* Example observation */}
+          {activity.example?.observation && (
+            <div className="mt-3 text-xs text-gray-400 italic">
+              {activity.example.observation}
+            </div>
+          )}
         </div>
       </div>
     );
@@ -379,8 +484,8 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
       prompt={activity.prompt}
       exampleTerminal={renderExampleTerminal()}
     >
-      {/* Unified Student Terminal for basic-03 - Inside ActivityShell */}
-      {activity.id === 'double_print' ? (
+      {/* Unified Student Terminal for basic-03 and basic-04 - Inside ActivityShell */}
+      {(activity.id === 'double_print' || activity.id === 'triple_echo') ? (
         <div className="space-y-4">
           {/* Single Student Terminal */}
           <div className="rounded-xl border border-white/10 bg-[#0c0f1a]">
@@ -424,32 +529,60 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
             {/* Organize Mode */}
             {mode === 'organize' && (
               <div className="space-y-4">
-                {/* Assembly line (dropzone) */}
-                <div className="bg-black/20 rounded-lg p-4 min-h-[80px]">
-                  <div className="text-xs text-gray-400 mb-2">Linha de montagem:</div>
-                  <div className="flex flex-wrap gap-2 min-h-[40px] items-center">
-                    {selectedChips.length > 0 ? (
-                      selectedChips.map((chip, index) => (
-                        <button
-                          key={index}
-                          onClick={() => removeChip(index)}
-                          className="inline-flex items-center px-2 py-1 rounded bg-primary text-primary-foreground text-sm font-mono hover:bg-primary/80 transition-colors"
-                        >
-                          {chip}
-                          <span className="ml-1 text-xs">×</span>
-                        </button>
-                      ))
-                    ) : (
-                      <div className="text-gray-500 text-sm font-mono">Clique nas palavras abaixo para montar</div>
-                    )}
+                {/* Assembly line (dropzone) - Different layout for basic-04 */}
+                {activity.id === 'triple_echo' ? (
+                  // For triple echo: 3 slots for lines
+                  <div className="bg-black/20 rounded-lg p-4 min-h-[120px]">
+                    <div className="text-xs text-gray-400 mb-3">Monte suas 3 linhas:</div>
+                    <div className="space-y-2">
+                      {[0, 1, 2].map((lineIndex) => (
+                        <div key={lineIndex} className="bg-black/30 rounded p-2 min-h-[32px] flex items-center">
+                          <span className="text-gray-500 text-xs mr-2">Linha {lineIndex + 1}:</span>
+                          <div className="flex gap-1">
+                            {selectedChips[lineIndex] ? (
+                              <button
+                                onClick={() => removeChip(lineIndex)}
+                                className="inline-flex items-center px-2 py-1 rounded bg-primary text-primary-foreground text-sm font-mono hover:bg-primary/80 transition-colors"
+                              >
+                                {selectedChips[lineIndex]}
+                                <span className="ml-1 text-xs">×</span>
+                              </button>
+                            ) : (
+                              <div className="text-gray-600 text-sm font-mono">Clique em um chip abaixo</div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  // For greeting: single assembly line
+                  <div className="bg-black/20 rounded-lg p-4 min-h-[80px]">
+                    <div className="text-xs text-gray-400 mb-2">Linha de montagem:</div>
+                    <div className="flex flex-wrap gap-2 min-h-[40px] items-center">
+                      {selectedChips.length > 0 ? (
+                        selectedChips.map((chip, index) => (
+                          <button
+                            key={index}
+                            onClick={() => removeChip(index)}
+                            className="inline-flex items-center px-2 py-1 rounded bg-primary text-primary-foreground text-sm font-mono hover:bg-primary/80 transition-colors"
+                          >
+                            {chip}
+                            <span className="ml-1 text-xs">×</span>
+                          </button>
+                        ))
+                      ) : (
+                        <div className="text-gray-500 text-sm font-mono">Clique nas palavras abaixo para montar</div>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {/* Final code display */}
                 <div className="bg-black/30 rounded-lg p-3">
                   <div className="text-xs text-gray-400 mb-1">Código final:</div>
-                  <code className="text-[#d1ffd1] font-mono text-sm">
-                    {studentCode || 'print("Olá, Commitinho")'}
+                  <code className="text-[#d1ffd1] font-mono text-sm whitespace-pre-line">
+                    {studentCode || (activity.id === 'triple_echo' ? 'print("eco")\nprint("eco")\nprint("eco")' : 'print("Olá, Commitinho")')}
                   </code>
                 </div>
 
@@ -477,7 +610,9 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
                 <textarea
                   value={studentCode}
                   onChange={(e) => handleStudentCodeChange(e.target.value)}
-                  placeholder="# Digite seu código aqui"
+                  placeholder={activity.id === 'triple_echo' 
+                    ? '# Escreva três prints com "eco" (um por linha)' 
+                    : '# Digite seu código aqui'}
                   className="w-full bg-black/20 text-[#d1ffd1] font-mono leading-7 min-h-32 p-4 rounded-lg resize-none outline-none placeholder-green-600/50 border-0"
                   disabled={hasExecuted && isCorrect}
                   rows={6}

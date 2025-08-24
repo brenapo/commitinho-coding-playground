@@ -1,25 +1,30 @@
 export const lessonData = {
   id: "basic-04",
-  title: "Eco 3x",
+  title: "Eco, eco, eco!",
   intro: {
     image: "/assets/commitinho/intro.png",
-    title: "Fazendo eco",
-    text: "Vamos fazer eco três vezes seguidas!",
-    cta: { label: "Iniciar Atividade", goto: "echo_three" }
+    title: "Eco, eco, eco!",
+    text: "Vamos criar um eco na caverna com três prints seguidos!",
+    cta: { label: "Iniciar Atividade", goto: "triple_echo" }
   },
   activities: [
     {
-      id: "echo_three",
+      id: "triple_echo",
       type: "code_write",
       title: "Eco, eco, eco!",
-      helper: { text: "Três prints com a palavra 'eco'. Vai ecoar muito! 📢" },
-      explain: "<p>Escreva três <code>print(\"eco\")</code> seguidos:</p>",
-      prompt: "Faça o eco acontecer 3 vezes:",
+      helper: { text: "Três prints com a palavra 'eco'. Clique em Executar para ouvir o eco!" },
+      explain: "Escreva três <code>print(\"eco\")</code> seguidos.",
+      prompt: "Escreva três print(\"eco\") seguidos:",
+      example: {
+        code: "print(\"Ecooo!\")",
+        runLabel: "▶ Rodar exemplo",
+        observation: "Exemplo: um grito na caverna. Agora faça o eco voltar 3 vezes."
+      },
       expectedOutput: ["eco", "eco", "eco"],
-      successTemplate: "Eco perfeito! Três vezes certinho! 🔊",
+      successTemplate: "Uhuu! Os três ecos voltaram! 🎉",
       successExplain: "Repetindo print, você repete a mensagem. Um print por linha = um eco por vez!",
-      runLabel: "Executar",
-      xp: 12
+      runLabel: "Executar código",
+      xp: 15
     }
   ],
   next: "basic-05"
