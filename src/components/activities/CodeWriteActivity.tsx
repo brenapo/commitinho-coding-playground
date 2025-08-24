@@ -85,32 +85,18 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
   });
   const [selectedChips, setSelectedChips] = useState<string[]>([]);
   const [availableChips, setAvailableChips] = useState<string[]>([]);
-  const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'challenge'>('easy');
   const [hasExecutedOnce, setHasExecutedOnce] = useState(false);
 
-  // Initialize chips based on activity ID and difficulty (only for basic-03)
+  // Initialize and shuffle chips for basic-03
   useEffect(() => {
     if (activity.id === 'double_print') {
-      let chips: string[] = [];
-      let distractors: string[] = [];
-      
-      if (difficulty === 'easy') {
-        chips = ['print', '(', '"Olá, Commitinho"', ')'];
-        distractors = [];
-      } else if (difficulty === 'medium') {
-        chips = ['print', '(', '"Olá,"', '"Commitinho"', ')'];
-        distractors = [';'];
-      } else if (difficulty === 'challenge') {
-        chips = ['print', '(', '"', 'Olá,', 'Commitinho', '"', ')'];
-        distractors = [';', 'input', '='];
-      }
-      
-      setAvailableChips([...chips, ...distractors]);
-      // Clear selected chips and reset studentCode when difficulty changes
-      setSelectedChips([]);
-      setStudentCode('');
+      // Use simple set of chips - just shuffled
+      const chips = ['print', '(', '"Olá, Commitinho"', ')'];
+      // Shuffle the chips so they're not in correct order
+      const shuffled = [...chips].sort(() => Math.random() - 0.5);
+      setAvailableChips(shuffled);
     }
-  }, [activity.id, difficulty]);
+  }, [activity.id]);
 
   // Sync studentCode when chips change in organize mode
   useEffect(() => {
@@ -201,8 +187,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
           const message = activity.successTemplate || 'Perfeito! Código executado com sucesso!';
           setSuccessMessage(message);
           
-          // Show success modal immediately after validation
-          setShowSuccessModal(true);
+          // Don't show success modal immediately, let user click next mission
         } else {
           setIsCorrect(false);
           setErrorMessage(`Esperado algo como "Olá, Commitinho". Recebido: "${output[0]}"`);
@@ -301,6 +286,11 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
   const handleStudentCodeChange = (code: string) => {
     setStudentCode(code);
     resetExecutionState();
+  };
+
+  // Handle next mission button click
+  const handleNextMission = () => {
+    setShowSuccessModal(true);
   };
 
   const renderExampleTerminal = () => {
@@ -420,51 +410,6 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
             {/* Organize Mode */}
             {mode === 'organize' && (
               <div className="space-y-4">
-                {/* Difficulty selector */}
-                <div className="flex justify-center">
-                  <div className="bg-gray-800 rounded-lg p-1 flex gap-1">
-                    <button
-                      onClick={() => {
-                        setDifficulty('easy');
-                        resetExecutionState();
-                      }}
-                      className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
-                        difficulty === 'easy' 
-                          ? 'bg-green-600 text-white' 
-                          : 'text-gray-300 hover:text-white hover:bg-gray-700'
-                      }`}
-                    >
-                      Fácil
-                    </button>
-                    <button
-                      onClick={() => {
-                        setDifficulty('medium');
-                        resetExecutionState();
-                      }}
-                      className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
-                        difficulty === 'medium' 
-                          ? 'bg-yellow-600 text-white' 
-                          : 'text-gray-300 hover:text-white hover:bg-gray-700'
-                      }`}
-                    >
-                      Mais peças
-                    </button>
-                    <button
-                      onClick={() => {
-                        setDifficulty('challenge');
-                        resetExecutionState();
-                      }}
-                      className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
-                        difficulty === 'challenge' 
-                          ? 'bg-red-600 text-white' 
-                          : 'text-gray-300 hover:text-white hover:bg-gray-700'
-                      }`}
-                    >
-                      Desafio
-                    </button>
-                  </div>
-                </div>
-
                 {/* Assembly line (dropzone) */}
                 <div className="bg-black/20 rounded-lg p-4 min-h-[80px]">
                   <div className="text-xs text-gray-400 mb-2">Linha de montagem:</div>
@@ -526,6 +471,18 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
               </div>
             )}
 
+            {/* Execute Button - Inside Terminal */}
+            <div className="flex justify-center mt-4">
+              <Button
+                id="run-student-code"
+                onClick={handleExecute}
+                disabled={hasExecuted && !isCorrect}
+                className="bg-gradient-arcade hover:shadow-glow-primary px-8 py-3 text-lg font-semibold text-white"
+              >
+                Executar código
+              </Button>
+            </div>
+
             {/* Output Panel - Inside terminal, appears after execution */}
             {hasExecutedOnce && (studentOutput || studentError) && (
               <div className="mt-4 pt-4 border-t border-white/10">
@@ -567,30 +524,21 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
           </div>
         </div>
 
-        {/* Warning message above execute button */}
-        {!hasExecutedOnce && (
-          <div className="text-center mt-4 mb-4">
-            <p className="text-commitinho-text-soft text-sm">
-              Clique em Executar código para ver como ficou.
-            </p>
+        {/* Next Mission Button - After successful execution */}
+        {hasExecutedOnce && isCorrect && (
+          <div className="flex justify-center mt-4">
+            <Button
+              onClick={handleNextMission}
+              className="bg-green-600 hover:bg-green-700 px-8 py-3 font-semibold text-white"
+            >
+              🚀 Próxima missão
+            </Button>
           </div>
         )}
 
-        {/* Execute Button - Large and prominent */}
-        <div className="flex justify-center mb-4">
-          <Button
-            id="run-student-code"
-            onClick={handleExecute}
-            disabled={hasExecuted && !isCorrect}
-            className="bg-gradient-arcade hover:shadow-glow-primary px-12 py-4 text-lg font-semibold text-white"
-          >
-            Executar código
-          </Button>
-        </div>
-
         {/* Next Mission Button - Only after failure */}
         {hasExecutedOnce && !isCorrect && (
-          <div className="flex justify-center">
+          <div className="flex justify-center mt-4">
             <div className="relative">
               <Button
                 disabled={true}
