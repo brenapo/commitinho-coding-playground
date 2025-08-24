@@ -375,26 +375,11 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
         </Card>
       ) : undefined}
     >
-      {/* Only show basic content for non-basic-03 activities */}
-      {activity.id !== 'double_print' && (
+      {/* Unified Student Terminal for basic-03 - Inside ActivityShell */}
+      {activity.id === 'double_print' ? (
         <div className="space-y-4">
-          <textarea
-            value={studentCode}
-            onChange={(e) => handleStudentCodeChange(e.target.value)}
-            placeholder="Digite seu código aqui…"
-            className="w-full bg-gray-800 text-green-400 font-mono leading-7 min-h-32 p-4 rounded-lg resize-none outline-none placeholder-green-600/50 border border-gray-700"
-            disabled={hasExecuted && isCorrect}
-            rows={6}
-          />
-        </div>
-      )}
-    </ActivityShell>
-
-    {/* Unified Student Terminal for basic-03 */}
-    {activity.id === 'double_print' && (
-      <div className="max-w-4xl mx-auto px-4 pb-8">
-        {/* Single Student Terminal */}
-        <div className="mb-4 rounded-xl border border-white/10 bg-[#0c0f1a]">
+          {/* Single Student Terminal */}
+          <div className="rounded-xl border border-white/10 bg-[#0c0f1a]">
           {/* Terminal Header with toggle */}
           <div className="flex items-center justify-between px-4 py-2 border-b border-white/10">
             <div className="flex items-center gap-2">
@@ -584,7 +569,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
 
         {/* Warning message above execute button */}
         {!hasExecutedOnce && (
-          <div className="text-center mb-4">
+          <div className="text-center mt-4 mb-4">
             <p className="text-commitinho-text-soft text-sm">
               Clique em Executar código para ver como ficou.
             </p>
@@ -592,7 +577,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
         )}
 
         {/* Execute Button - Large and prominent */}
-        <div className="flex justify-center mb-6">
+        <div className="flex justify-center mb-4">
           <Button
             id="run-student-code"
             onClick={handleExecute}
@@ -605,7 +590,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
 
         {/* Next Mission Button - Only after failure */}
         {hasExecutedOnce && !isCorrect && (
-          <div className="flex justify-center mt-6">
+          <div className="flex justify-center">
             <div className="relative">
               <Button
                 disabled={true}
@@ -617,8 +602,21 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
             </div>
           </div>
         )}
-      </div>
-    )}
+        </div>
+      ) : (
+        // For other activities, show regular textarea
+        <div className="space-y-4">
+          <textarea
+            value={studentCode}
+            onChange={(e) => handleStudentCodeChange(e.target.value)}
+            placeholder="Digite seu código aqui…"
+            className="w-full bg-gray-800 text-green-400 font-mono leading-7 min-h-32 p-4 rounded-lg resize-none outline-none placeholder-green-600/50 border border-gray-700"
+            disabled={hasExecuted && isCorrect}
+            rows={6}
+          />
+        </div>
+      )}
+    </ActivityShell>
 
     {/* Success Modal */}
     <SuccessModal
