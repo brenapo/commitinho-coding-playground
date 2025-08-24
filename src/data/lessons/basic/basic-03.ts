@@ -12,7 +12,7 @@ export const lessonData = {
       id: "double_print",
       type: "code_write",
       title: "Saudação ao Commitinho",
-      helper: { text: "Dica: monte ou digite para o computador dizer 'Olá, Commitinho'. Depois clique em Executar!" },
+      helper: { text: "Monte ou digite e depois clique em Executar para ver o computador falar!" },
       explain: "Use o <code>print</code> para fazer o computador falar <em>Olá, Commitinho</em>.",
       prompt: "Digite seu código nas linhas abaixo:",
       example: {

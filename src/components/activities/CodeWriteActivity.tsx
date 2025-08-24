@@ -190,19 +190,15 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
         if (isValidGreeting) {
           setIsCorrect(true);
           
-          // Show confetti animation on first successful execution
-          if (!showConfetti) {
-            setShowConfetti(true);
-            setTimeout(() => setShowConfetti(false), 3000);
-          }
+          // Show confetti animation on successful execution
+          setShowConfetti(true);
+          setTimeout(() => setShowConfetti(false), 3000);
           
           const message = activity.successTemplate || 'Perfeito! Código executado com sucesso!';
           setSuccessMessage(message);
           
-          // Small delay before showing success modal
-          setTimeout(() => {
-            setShowSuccessModal(true);
-          }, 1000);
+          // Show success modal immediately after validation
+          setShowSuccessModal(true);
         } else {
           setIsCorrect(false);
           setErrorMessage(`Esperado algo como "Olá, Commitinho". Recebido: "${output[0]}"`);
@@ -329,18 +325,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
       helperText={activity.helper?.text}
       explain={activity.explain}
       prompt={activity.prompt}
-      onRun={!hasExecuted ? handleExecute : undefined}
-      runLabel={activity.runLabel || "Executar"}
       exampleTerminal={renderExampleTerminal()}
-      executionMessage={
-        activity.id === 'double_print' && !hasExecutedOnce 
-          ? "Clique em Executar para ver como ficou." 
-          : undefined
-      }
-      showNextButton={activity.id === 'double_print'}
-      onNext={isCorrect ? handleComplete : undefined}
-      nextButtonDisabled={!hasExecutedOnce || !isCorrect}
-      nextButtonTooltip={!hasExecutedOnce ? "Execute seu código primeiro." : undefined}
       feedback={hasExecuted && !isCorrect ? (
         <Card className="bg-red-500/10 border-red-500 max-w-lg mx-auto">
           <CardContent className="p-6 text-center">
@@ -523,7 +508,58 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
           />
         )}
 
-        {/* Student Terminal Output (after execution) */}
+      </div>
+    </ActivityShell>
+
+    {/* Student Terminal - Outside ActivityShell for proper layout */}
+    {activity.id === 'double_print' && (
+      <div className="max-w-4xl mx-auto px-4 pb-8">
+        {/* Student Terminal (Editor) */}
+        <div className="mb-4 rounded-xl border border-white/10 bg-[#0c0f1a]">
+          <div className="flex items-center gap-2 px-4 py-2 border-b border-white/10">
+            <div className="flex gap-1">
+              <span className="w-2.5 h-2.5 rounded-full bg-red-500" />
+              <span className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
+              <span className="w-2.5 h-2.5 rounded-full bg-green-500" />
+            </div>
+            <div className="ml-3 text-sm opacity-80 text-gray-300">Python Terminal (Seu código)</div>
+          </div>
+
+          <div className="p-4">
+            {/* Show current code */}
+            <pre className="rounded-lg bg-black/20 p-4 overflow-x-auto text-[#d1ffd1] text-sm font-mono min-h-[80px] flex items-center">
+              <code>
+{mode === 'organize' 
+  ? (selectedChips.length > 0 ? selectedChips.join('') : '# Monte o código usando as palavras acima')
+  : (userCode || '# Digite seu código aqui…')
+}
+              </code>
+            </pre>
+          </div>
+        </div>
+
+        {/* Warning message above execute button */}
+        {!hasExecutedOnce && (
+          <div className="text-center mb-4">
+            <p className="text-commitinho-text-soft text-sm">
+              Clique em Executar código para ver como ficou.
+            </p>
+          </div>
+        )}
+
+        {/* Execute Button - Large and prominent */}
+        <div className="flex justify-center mb-6">
+          <Button
+            id="run-student-code"
+            onClick={handleExecute}
+            disabled={hasExecuted && !isCorrect}
+            className="bg-gradient-arcade hover:shadow-glow-primary px-12 py-4 text-lg font-semibold text-white"
+          >
+            Executar código
+          </Button>
+        </div>
+
+        {/* Output Panel - Appears after execution */}
         {hasExecutedOnce && (studentOutput || studentError) && (
           <div className="mt-6 rounded-xl border border-white/10 bg-[#0c0f1a]">
             <div className="flex items-center gap-2 px-4 py-2 border-b border-white/10">
@@ -532,19 +568,16 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
                 <span className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
                 <span className="w-2.5 h-2.5 rounded-full bg-green-500" />
               </div>
-              <div className="ml-3 text-sm opacity-80 text-gray-300">Python Terminal (Seu código)</div>
+              <div className="ml-3 text-sm opacity-80 text-gray-300">Saída do Programa</div>
               {showConfetti && (
                 <div className="ml-auto text-2xl animate-bounce">🎉</div>
               )}
             </div>
 
             <div className="p-4">
-              <pre className="rounded-lg bg-black/20 p-4 overflow-x-auto text-[#d1ffd1] text-sm font-mono">
-{mode === 'organize' ? selectedChips.join('') : userCode}
-              </pre>
-              <div className="mt-4 rounded-lg bg-black/30 p-3">
+              <div className="rounded-lg bg-black/30 p-3">
                 <div className="flex items-center justify-between mb-1">
-                  <div className="text-xs opacity-60 text-gray-400">Saída</div>
+                  <div className="text-xs opacity-60 text-gray-400">Resultado</div>
                   {studentOutput && isCorrect && (
                     <button
                       onClick={() => {
@@ -575,8 +608,23 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
             </div>
           </div>
         )}
+
+        {/* Next Mission Button - Only after success */}
+        {hasExecutedOnce && !isCorrect && (
+          <div className="flex justify-center mt-6">
+            <div className="relative">
+              <Button
+                disabled={true}
+                className="bg-gray-600 text-gray-400 cursor-not-allowed px-8 py-3 font-semibold"
+                title="Execute e acerte seu código para avançar."
+              >
+                Próxima missão
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
-    </ActivityShell>
+    )}
 
     {/* Success Modal */}
     <SuccessModal
