@@ -1,24 +1,29 @@
 export const lessonData = {
   id: "basic-10",
-  title: "Grande Final: O Show do Commitinho",
+  title: "Checkpoint 1 (revisão)",
   intro: {
     image: "/assets/commitinho/intro.png",
-    title: "Show do Commitinho",
-    text: "Crie um mini show com 5 linhas usando print.",
-    cta: { label: "Iniciar Atividade", goto: "commitinho_show" }
+    title: "Checkpoint 1",
+    text: "Três desafios rapidinhos: 1 fala, 3 ecos, e 2 linhas de cartaz!",
+    cta: { label: "Iniciar Atividade", goto: "checkpoint_1" }
   },
   activities: [
     {
-      id: "commitinho_show",
-      type: "code_free",
-      title: "Palco liberado!",
-      helper: { text: "Capriche! 5 linhas, cada uma com um print. 🎤" },
-      explain: "<p>Exemplo:</p><pre><code>print(\"🎤 Bem-vindos!\")\nprint(\"Commitinho chegou!\")\nprint(\"Aplausos!!! 👏\")\nprint(\"Banana time! 🍌\")\nprint(\"Boa noite!\")</code></pre>",
-      prompt: "Escreva seu show com 5 prints:",
-      expectedRegex: "^(?:(?:\\s*print\\(.+\\)\\s*\\n)){5}$",
-      successTemplate: "Brilhou! O show ficou demais! 🚀",
-      successExplain: "Você juntou tudo: várias falas, ordem certa e criatividade. Programar é contar histórias!",
-      runLabel: "Executar",
+      id: "checkpoint_1",
+      type: "code_write",
+      title: "Checkpoint 1 (revisão)",
+      helper: { text: "Três desafios rapidinhos: 1 fala, 3 ecos, e 2 linhas de cartaz!" },
+      explain: "Complete os três desafios para mostrar que domina o <code>print</code>!",
+      prompt: "Digite seu código nas linhas abaixo:",
+      example: {
+        code: "print(\"Teste!\")",
+        runLabel: "▶ Rodar exemplo",
+        observation: "Exemplo: pode repetir um exemplo curto que não resolva nenhuma subtarefa."
+      },
+      expectedOutput: [],
+      successTemplate: "Você dominou o print! 🏆",
+      successExplain: "Texto entre aspas vira fala. A ordem das linhas vira história.",
+      runLabel: "Executar código",
       xp: 20
     }
   ],

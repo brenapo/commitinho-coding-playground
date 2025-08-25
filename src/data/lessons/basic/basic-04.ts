@@ -22,9 +22,9 @@ export const lessonData = {
       },
       expectedOutput: ["eco", "eco", "eco"],
       successTemplate: "Uhuu! Os três ecos voltaram! 🎉",
-      successExplain: "Repetindo print, você repete a mensagem. Um print por linha = um eco por vez!",
+      successExplain: "1 print por linha = 1 eco.",
       runLabel: "Executar código",
-      xp: 15
+      xp: 12
     }
   ],
   next: "basic-05"

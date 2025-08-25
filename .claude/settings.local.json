@@ -12,7 +12,8 @@
     "deny": [],
     "ask": [],
     "additionalDirectories": [
-      "C:\\Users\\breno\\Downloads"
+      "C:\\Users\\breno\\Downloads",
+      "C:\\c\\Users\\breno\\Documents\\littlecommit"
     ]
   }
 }

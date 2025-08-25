@@ -16,13 +16,14 @@ export const lessonData = {
       explain: "Use o <code>print</code> para fazer o computador falar <em>Olá, Commitinho</em>.",
       prompt: "Digite seu código nas linhas abaixo:",
       example: {
-        code: "print(\"Olá, Commitinho\")",
-        runLabel: "▶ Rodar exemplo"
+        code: "print(\"Oi, amigo!\")",
+        runLabel: "▶ Rodar exemplo",
+        observation: "Exemplo: diferente do alvo. Agora faça o computador cumprimentar o Commitinho!"
       },
       starter: "print(\"Olá, Commitinho\")",
       expectedOutput: ["Olá, Commitinho"],
       successTemplate: "Uhuu! Você fez o computador dizer: Olá, Commitinho! 🎉",
-      successExplain: "O print faz o computador falar exatamente o texto entre aspas.",
+      successExplain: "A ordem e o texto importam.",
       runLabel: "Executar",
       xp: 12
     }
