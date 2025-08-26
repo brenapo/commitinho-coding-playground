@@ -9,6 +9,7 @@ import { useSupabaseProgress } from '@/hooks/useSupabaseProgress';
 import { basicAdventureLessons, getLessonById } from '@/data/curriculum';
 import { lesson1Data } from '@/data/lessons/lesson-1';
 import { lesson2Data } from '@/data/lessons/lesson-2';
+import { processObjectTokens } from '@/utils/templateEngine';
 import CodeFillActivity from '@/components/activities/CodeFillActivity';
 import CodeWriteActivity from '@/components/activities/CodeWriteActivity';
 import CodeFreeActivity from '@/components/activities/CodeFreeActivity';
@@ -76,7 +77,10 @@ const Licao = () => {
         }
         
         console.log(`✅ Loaded lesson content:`, content.title);
-        setLessonContent(content);
+        
+        // Process tokens like {{childName}} before setting content
+        const processedContent = processObjectTokens(content);
+        setLessonContent(processedContent);
       } catch (error) {
         console.error('❌ Error loading lesson content:', error);
       }

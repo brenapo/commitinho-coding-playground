@@ -7,13 +7,18 @@
       "Bash(npm run dev:*)",
       "Bash(git push:*)",
       "Bash(rm:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(copy:*)",
+      "Bash(cp:*)",
+      "Bash(npm run typecheck:*)",
+      "Bash(npm run:*)"
     ],
     "deny": [],
     "ask": [],
     "additionalDirectories": [
       "C:\\Users\\breno\\Downloads",
-      "C:\\c\\Users\\breno\\Documents\\littlecommit"
+      "C:\\c\\Users\\breno\\Documents\\littlecommit",
+      "C:\\Users\\breno\\Pictures\\commitinho"
     ]
   }
 }

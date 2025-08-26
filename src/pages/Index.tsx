@@ -26,18 +26,16 @@ const Index = () => {
       return;
     }
     
-    if (hasProgress) {
-      // Check if should show review
-      if (shouldShowReviewPrompt()) {
-        // For now, just continue to adventure
-        // In a full implementation, you might show a review selection
-        navigate('/aventura');
-      } else {
-        navigate('/aventura');
-      }
+    // Check if user has a name saved (completed welcome flow)
+    const savedName = localStorage.getItem('commitinho.display_name');
+    const hasCompletedWelcome = savedName && savedName.length >= 2;
+    
+    if (hasProgress && hasCompletedWelcome) {
+      // User has progress AND completed welcome - go to progress page
+      navigate('/aventura/progresso');
     } else {
-      // First time - start from basic adventure lesson 1
-      navigate('/licao/basic-01');
+      // First time OR hasn't completed welcome - go to welcome page
+      navigate('/aventura/boas-vindas');
     }
   };
 
@@ -181,7 +179,7 @@ const Index = () => {
                 Continue de onde parou ou explore a árvore de habilidades!
               </p>
               <Button 
-                onClick={() => navigate('/aventura')}
+                onClick={handleStartAdventure}
                 variant="outline"
                 className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
               >

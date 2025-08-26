@@ -4,31 +4,26 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Star, Play, Lock, Trophy, Check } from 'lucide-react';
+import { Star, Play, Lock, Trophy, Check, RotateCcw } from 'lucide-react';
 import { UserProgress, SkillNode } from '@/types/progress';
 import { useSupabaseProgress } from '@/hooks/useSupabaseProgress';
 import { curriculum, basicAdventureWorld, basicAdventureLessons } from '@/data/curriculum';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 const Aventura = () => {
   const navigate = useNavigate();
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
+  const [showResetDialog, setShowResetDialog] = useState(false);
   const { 
     progress, 
     isLoading, 
     getNextLessonId, 
     isSkillUnlockedForUser, 
-    getSkillStarsForUser 
+    getSkillStarsForUser,
+    resetUserProgress
   } = useSupabaseProgress();
 
-  if (isLoading || !progress) {
-    return (
-      <div className="min-h-screen bg-commitinho-bg flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
-  // Basic Adventure helpers
+  // Basic Adventure helpers - MOVE BEFORE CONDITIONAL RETURN
   useEffect(() => {
     if (!progress) return;
     const lastCompletedIndex = basicAdventureLessons.findLastIndex(lesson => 
@@ -39,6 +34,14 @@ const Aventura = () => {
     const nextIndex = lastCompletedIndex + 1;
     setCurrentLessonIndex(Math.min(nextIndex, basicAdventureLessons.length - 1));
   }, [progress]);
+
+  if (isLoading || !progress) {
+    return (
+      <div className="min-h-screen bg-commitinho-bg flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   const handleBasicLessonClick = (lessonIndex: number) => {
     const lesson = basicAdventureLessons[lessonIndex];
@@ -131,6 +134,15 @@ const Aventura = () => {
     return hasProgress ? 'in-progress' : 'available';
   };
 
+  const handleResetAdventure = () => {
+    // Clear localStorage name and reset progress
+    localStorage.removeItem('commitinho.display_name');
+    resetUserProgress();
+    setShowResetDialog(false);
+    // Redirect to welcome page
+    navigate('/aventura/boas-vindas');
+  };
+
   return (
     <div className="min-h-screen bg-commitinho-bg">
       {/* Header */}
@@ -144,7 +156,7 @@ const Aventura = () => {
               <p className="text-commitinho-text-soft">Aprenda programação passo a passo!</p>
             </div>
             
-            {/* Stats */}
+            {/* Stats and Reset Button */}
             <div className="hidden sm:flex items-center space-x-6">
               <div className="text-center">
                 <div className="text-2xl font-bold text-commitinho-warning">{progress.xp}</div>
@@ -160,31 +172,94 @@ const Aventura = () => {
                 </div>
                 <div className="text-sm text-commitinho-text-soft">Estrelas</div>
               </div>
+              
+              {/* Reset Button */}
+              <AlertDialog open={showResetDialog} onOpenChange={setShowResetDialog}>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    variant="destructive" 
+                    size="sm"
+                    className="bg-red-600 hover:bg-red-700 text-white font-medium"
+                  >
+                    <RotateCcw className="mr-2 h-4 w-4" />
+                    Reiniciar Aventura
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="bg-commitinho-surface border-commitinho-surface-2 mx-4 max-w-lg">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-commitinho-text text-lg sm:text-xl flex items-center">
+                      <RotateCcw className="mr-2 h-5 w-5 text-red-500" />
+                      Reiniciar toda a Aventura?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription className="text-commitinho-text-soft text-sm sm:text-base">
+                      Esta ação irá apagar <strong>todo o seu progresso atual</strong>, incluindo:
+                      <br />• Todas as estrelas conquistadas
+                      <br />• Todo o XP acumulado
+                      <br />• Dias de sequência (streak)
+                      <br />• Nome da criança
+                      <br /><br />
+                      Você voltará para a tela de apresentação do Commitinho onde precisará inserir o nome novamente.
+                      <br /><br />
+                      <span className="text-red-400 font-medium">Esta ação não pode ser desfeita!</span>
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                    <AlertDialogCancel className="w-full sm:w-auto bg-commitinho-surface-2 text-commitinho-text border-commitinho-surface-2 hover:bg-commitinho-surface">
+                      Cancelar
+                    </AlertDialogCancel>
+                    <AlertDialogAction 
+                      onClick={handleResetAdventure}
+                      className="w-full sm:w-auto bg-red-600 text-white hover:bg-red-700 font-medium"
+                    >
+                      <RotateCcw className="mr-2 h-4 w-4" />
+                      Sim, Reiniciar Aventura
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
 
           {/* Mobile stats */}
-          <div className="sm:hidden grid grid-cols-3 gap-4 mb-8">
-            <Card className="bg-commitinho-surface border-commitinho-surface-2 text-center">
-              <CardContent className="p-4">
-                <div className="text-xl font-bold text-commitinho-warning">{progress.xp}</div>
-                <div className="text-xs text-commitinho-text-soft">XP</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-commitinho-surface border-commitinho-surface-2 text-center">
-              <CardContent className="p-4">
-                <div className="text-xl font-bold text-primary">{progress.streak}</div>
-                <div className="text-xs text-commitinho-text-soft">Dias</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-commitinho-surface border-commitinho-surface-2 text-center">
-              <CardContent className="p-4">
-                <div className="text-xl font-bold text-secondary">
-                  {Object.values(progress.stars).reduce((sum, stars) => sum + stars, 0)}
-                </div>
-                <div className="text-xs text-commitinho-text-soft">Estrelas</div>
-              </CardContent>
-            </Card>
+          <div className="sm:hidden space-y-4 mb-8">
+            <div className="grid grid-cols-3 gap-4">
+              <Card className="bg-commitinho-surface border-commitinho-surface-2 text-center">
+                <CardContent className="p-4">
+                  <div className="text-xl font-bold text-commitinho-warning">{progress.xp}</div>
+                  <div className="text-xs text-commitinho-text-soft">XP</div>
+                </CardContent>
+              </Card>
+              <Card className="bg-commitinho-surface border-commitinho-surface-2 text-center">
+                <CardContent className="p-4">
+                  <div className="text-xl font-bold text-primary">{progress.streak}</div>
+                  <div className="text-xs text-commitinho-text-soft">Dias</div>
+                </CardContent>
+              </Card>
+              <Card className="bg-commitinho-surface border-commitinho-surface-2 text-center">
+                <CardContent className="p-4">
+                  <div className="text-xl font-bold text-secondary">
+                    {Object.values(progress.stars).reduce((sum, stars) => sum + stars, 0)}
+                  </div>
+                  <div className="text-xs text-commitinho-text-soft">Estrelas</div>
+                </CardContent>
+              </Card>
+            </div>
+            
+            {/* Mobile Reset Button */}
+            <div className="text-center">
+              <AlertDialog open={showResetDialog} onOpenChange={setShowResetDialog}>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    variant="destructive" 
+                    size="sm"
+                    className="bg-red-600 hover:bg-red-700 text-white font-medium w-full sm:w-auto"
+                  >
+                    <RotateCcw className="mr-2 h-4 w-4" />
+                    Reiniciar Aventura
+                  </Button>
+                </AlertDialogTrigger>
+              </AlertDialog>
+            </div>
           </div>
         </div>
       </section>

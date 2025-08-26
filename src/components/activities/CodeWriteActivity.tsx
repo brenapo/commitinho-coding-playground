@@ -6,6 +6,7 @@ import { Play, CheckCircle } from 'lucide-react';
 import ActivityShell from './ActivityShell';
 import SuccessModal from '@/components/ui/SuccessModal';
 import ErrorModal from '@/components/ui/ErrorModal';
+import { getChildName } from '@/utils/templateEngine';
 
 type ExampleBlock = {
   code: string;        // código de exemplo read-only
@@ -111,7 +112,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
   useEffect(() => {
     if (activity.id === 'double_print') {
       // Use simple set of chips - just shuffled
-      const chips = ['print', '(', '"Olá, Commitinho"', ')'];
+      const chips = ['print', '("', '"Olá, Commitinho"', '")'];
       // Shuffle the chips so they're not in correct order
       const shuffled = [...chips].sort(() => Math.random() - 0.5);
       setAvailableChips(shuffled);
@@ -145,13 +146,14 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
       const shuffled = allChips.sort(() => Math.random() - 0.5);
       setAvailableChips(shuffled);
     } else if (activity.id === 'primeira_fala') {
-      // Basic-01: Simple phrases with print syntax
-      const chips = ['print', '(', ')', '"Olá!"', '"Olá, mundo!"', '"Banana!"', '"Commitinho!"'];
+      // Basic-01: Presentation phrases with improved syntax + child's name
+      const childName = getChildName();
+      const chips = ['print', '("', '")', 'Olá!', 'Olá Commitinho!', 'Eu sou o', 'Eu sou a', childName];
       const shuffled = [...chips].sort(() => Math.random() - 0.5);
       setAvailableChips(shuffled);
     } else if (activity.id === 'frutas_falantes') {
       // Basic-02: Fruits with print syntax
-      const chips = ['print', '(', ')', '"Banana! 🍌"', '"Maçã! 🍎"', '"Uva! 🍇"', '"Manga! 🥭"', '"Abacaxi! 🍍"'];
+      const chips = ['print', '("', '")', '"Banana! 🍌"', '"Maçã! 🍎"', '"Uva! 🍇"', '"Manga! 🥭"', '"Abacaxi! 🍍"'];
       const shuffled = [...chips].sort(() => Math.random() - 0.5);
       setAvailableChips(shuffled);
     } else if (activity.id === 'show_emojis') {
@@ -179,7 +181,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
       setAvailableChips(shuffled);
     } else if (activity.id === 'placa_aviso') {
       // Basic-08: Warning signs with print syntax
-      const chips = ['print', '(', ')', '"Cuidado!"', '"Bem-vindos!"', '"Por favor, não corra!"', '"Atenção!"'];
+      const chips = ['print', '("', '")', '"Cuidado!"', '"Bem-vindos!"', '"Por favor, não corra!"', '"Atenção!"'];
       const shuffled = [...chips].sort(() => Math.random() - 0.5);
       setAvailableChips(shuffled);
     } else if (activity.id === 'cartao_visita') {
@@ -801,7 +803,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
       setSelectedChips([]);
       setStudentCode('');
       // Re-shuffle the chips
-      const chips = ['print', '(', '"Olá, Commitinho"', ')'];
+      const chips = ['print', '("', '"Olá, Commitinho"', '")'];
       const shuffled = [...chips].sort(() => Math.random() - 0.5);
       setAvailableChips(shuffled);
     } else if (activity.id === 'triple_echo') {
@@ -835,15 +837,16 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
     } else if (activity.id === 'primeira_fala') {
       setSelectedChips([]);
       setStudentCode('');
-      // Re-shuffle the chips for basic-01
-      const chips = ['print', '(', ')', '"Olá!"', '"Olá, mundo!"', '"Banana!"', '"Commitinho!"'];
+      // Re-shuffle the chips for basic-01 + child's name
+      const childName = getChildName();
+      const chips = ['print', '("', '")', 'Olá!', 'Olá Commitinho!', 'Eu sou o', 'Eu sou a', childName];
       const shuffled = [...chips].sort(() => Math.random() - 0.5);
       setAvailableChips(shuffled);
     } else if (activity.id === 'frutas_falantes') {
       setSelectedChips([]);
       setStudentCode('');
       // Re-shuffle the chips for basic-02
-      const chips = ['print', '(', ')', '"Banana! 🍌"', '"Maçã! 🍎"', '"Uva! 🍇"', '"Manga! 🥭"', '"Abacaxi! 🍍"'];
+      const chips = ['print', '("', '")', '"Banana! 🍌"', '"Maçã! 🍎"', '"Uva! 🍇"', '"Manga! 🥭"', '"Abacaxi! 🍍"'];
       const shuffled = [...chips].sort(() => Math.random() - 0.5);
       setAvailableChips(shuffled);
     } else if (activity.id === 'show_emojis') {
@@ -870,7 +873,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
       setSelectedChips([]);
       setStudentCode('');
       // Re-shuffle the chips for basic-08
-      const chips = ['print', '(', ')', '"Cuidado!"', '"Bem-vindos!"', '"Por favor, não corra!"', '"Atenção!"'];
+      const chips = ['print', '("', '")', '"Cuidado!"', '"Bem-vindos!"', '"Por favor, não corra!"', '"Atenção!"'];
       const shuffled = [...chips].sort(() => Math.random() - 0.5);
       setAvailableChips(shuffled);
     } else {

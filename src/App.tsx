@@ -11,6 +11,8 @@ import { AuthProvider } from "@/components/auth/AuthProvider";
 import Index from "./pages/Index";
 import Jogos from "./pages/Jogos";
 import Aventura from "./pages/Aventura";
+import BoasVindas from "./pages/BoasVindas";
+import ProgressoAventura from "./pages/ProgressoAventura";
 import Licao from "./pages/Licao";
 import NotFound from "./pages/NotFound";
 
@@ -34,6 +36,8 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/jogos" element={<Jogos />} />
                 <Route path="/aventura" element={<Aventura />} />
+                <Route path="/aventura/boas-vindas" element={<BoasVindas />} />
+                <Route path="/aventura/progresso" element={<ProgressoAventura />} />
                 <Route path="/licao/:lessonId" element={<Licao />} />
 
                 {/* Jogo: Robo-Correio */}
