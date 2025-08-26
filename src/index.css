@@ -48,6 +48,10 @@ Paleta "noite arcade" com acentos vibrantes. Todas as cores em HSL.
     --gradient-glow: linear-gradient(180deg, hsl(var(--bg)) 0%, hsl(var(--surface)) 100%);
     
     /* Efeitos e animações */
+    
+    /* Mobile optimizations */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
     --glow-primary: 0 0 20px hsl(var(--primary) / 0.3);
     --glow-secondary: 0 0 20px hsl(var(--secondary) / 0.3);
     --glow-warning: 0 0 15px hsl(var(--warning) / 0.4);
@@ -140,6 +144,31 @@ Paleta "noite arcade" com acentos vibrantes. Todas as cores em HSL.
     animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
   }
   
+  /* Mobile Scroll Optimizations */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari, Opera */
+  }
+  
+  /* Touch feedback */
+  .touch-feedback {
+    transition: transform 0.1s ease;
+  }
+  
+  .touch-feedback:active {
+    transform: scale(0.98);
+  }
+  
+  /* Smooth scroll for mobile */
+  .smooth-scroll {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
   /* Respect reduced motion preference */
   @media (prefers-reduced-motion: reduce) {
     .animate-float,

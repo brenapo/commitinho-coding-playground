@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -63,22 +63,26 @@ const Aventura = () => {
 
   if (isLoading || !progress) {
     return (
-      <div className="min-h-screen bg-commitinho-bg flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      <div className="min-h-screen bg-commitinho-bg flex items-center justify-center px-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 sm:h-32 sm:w-32 border-b-4 border-primary mx-auto mb-4"></div>
+          <p className="text-commitinho-text-soft animate-pulse">Carregando sua aventura...</p>
+        </div>
       </div>
     );
   }
 
-  const handleBasicLessonClick = (lessonIndex: number) => {
+  const handleBasicLessonClick = useCallback((lessonIndex: number) => {
+    hapticSuccess(); // Add haptic feedback
     const lesson = basicAdventureLessons[lessonIndex];
-    const isCompleted = (progress.stars[lesson.id] || 0) > 0;
+    const isCompleted = (progress?.stars[lesson.id] || 0) > 0;
     const isCurrent = lessonIndex === currentLessonIndex;
     const isFirstLesson = lessonIndex === 0;
     
     if (isCompleted || isCurrent || isFirstLesson) {
       navigate(`/licao/${lesson.id}`);
     }
-  };
+  }, [progress, currentLessonIndex, navigate, hapticSuccess]);
 
   const getBasicLessonStatus = (lessonIndex: number) => {
     if (!progress) return 'locked';
@@ -93,21 +97,24 @@ const Aventura = () => {
     return 'locked';
   };
 
-  const getTotalBasicStars = () => {
-    if (!progress) return 0;
-    return basicAdventureLessons.reduce((total, lesson) => 
+  // Memoized calculations for better performance
+  const basicStats = useMemo(() => {
+    if (!progress) return { totalStars: 0, completedLessons: 0, overallProgress: 0 };
+    
+    const totalStars = basicAdventureLessons.reduce((total, lesson) => 
       total + (progress.stars[lesson.id] || 0), 0
     );
-  };
+    const completedLessons = basicAdventureLessons.filter(lesson => 
+      (progress.stars[lesson.id] || 0) > 0
+    ).length;
+    const overallProgress = (completedLessons / basicAdventureLessons.length) * 100;
+    
+    return { totalStars, completedLessons, overallProgress };
+  }, [progress]);
 
-  const getCompletedBasicLessons = () => {
-    if (!progress) return 0;
-    return basicAdventureLessons.filter(lesson => (progress.stars[lesson.id] || 0) > 0).length;
-  };
-
-  const getBasicOverallProgress = () => {
-    return (getCompletedBasicLessons() / basicAdventureLessons.length) * 100;
-  };
+  const getTotalBasicStars = () => basicStats.totalStars;
+  const getCompletedBasicLessons = () => basicStats.completedLessons;
+  const getBasicOverallProgress = () => basicStats.overallProgress;
 
   // Module helper functions
   const getModuleProgress = (module: ModuleData) => {
@@ -316,24 +323,24 @@ const Aventura = () => {
             </div>
           </div>
 
-          {/* Mobile stats */}
+          {/* Mobile stats - Optimized */}
           <div className="sm:hidden space-y-4 mb-8">
-            <div className="grid grid-cols-3 gap-4">
-              <Card className="bg-commitinho-surface border-commitinho-surface-2 text-center">
-                <CardContent className="p-4">
-                  <div className="text-xl font-bold text-commitinho-warning">{progress.xp}</div>
+            <div className="grid grid-cols-3 gap-3">
+              <Card className="bg-commitinho-surface border-commitinho-surface-2 text-center touch-feedback">
+                <CardContent className="p-3 py-4">
+                  <div className="text-2xl font-bold text-commitinho-warning">{progress.xp}</div>
                   <div className="text-xs text-commitinho-text-soft">XP</div>
                 </CardContent>
               </Card>
-              <Card className="bg-commitinho-surface border-commitinho-surface-2 text-center">
-                <CardContent className="p-4">
-                  <div className="text-xl font-bold text-primary">{progress.streak}</div>
+              <Card className="bg-commitinho-surface border-commitinho-surface-2 text-center touch-feedback">
+                <CardContent className="p-3 py-4">
+                  <div className="text-2xl font-bold text-primary">{progress.streak}</div>
                   <div className="text-xs text-commitinho-text-soft">Dias</div>
                 </CardContent>
               </Card>
-              <Card className="bg-commitinho-surface border-commitinho-surface-2 text-center">
-                <CardContent className="p-4">
-                  <div className="text-xl font-bold text-secondary">
+              <Card className="bg-commitinho-surface border-commitinho-surface-2 text-center touch-feedback">
+                <CardContent className="p-3 py-4">
+                  <div className="text-2xl font-bold text-secondary">
                     {Object.values(progress.stars).reduce((sum, stars) => sum + stars, 0)}
                   </div>
                   <div className="text-xs text-commitinho-text-soft">Estrelas</div>
@@ -388,8 +395,77 @@ const Aventura = () => {
                 <Progress value={getBasicOverallProgress()} className="h-3" />
               </div>
 
-              {/* Lessons Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
+              {/* Lessons - Mobile: Horizontal Scroll, Desktop: Grid */}
+              <div className="block sm:hidden mb-6">
+                {/* Mobile Horizontal Scroll */}
+                <div className="flex gap-3 overflow-x-auto pb-4 px-1 -mx-1 scrollbar-hide">
+                  {basicAdventureLessons.map((lesson, index) => {
+                    const status = getBasicLessonStatus(index);
+                    const stars = progress.stars[lesson.id] || 0;
+
+                    return (
+                      <div
+                        key={lesson.id}
+                        className="flex-shrink-0 w-20"
+                      >
+                        <Card
+                          className={`
+                            transition-all duration-300 cursor-pointer relative overflow-hidden w-full
+                            ${status === 'locked' 
+                              ? 'bg-commitinho-surface/50 border-commitinho-surface-2/50 opacity-60' 
+                              : 'bg-commitinho-surface border-commitinho-surface-2 hover:shadow-glow-primary active:scale-95'
+                            }
+                            ${status === 'completed' ? 'ring-2 ring-commitinho-success' : ''}
+                            ${status === 'current' ? 'ring-2 ring-commitinho-warning animate-pulse' : ''}
+                          `}
+                          onClick={() => handleBasicLessonClick(index)}
+                          style={{ minHeight: '100px', minWidth: '80px' }}
+                        >
+                          <CardContent className="p-3 text-center h-full flex flex-col justify-center">
+                            <div className={`
+                              w-10 h-10 mx-auto mb-2 rounded-full flex items-center justify-center text-sm font-bold
+                              ${status === 'completed' ? 'bg-commitinho-success text-white' :
+                                status === 'current' ? 'bg-commitinho-warning text-white' :
+                                status === 'available' ? 'bg-primary text-white' :
+                                'bg-commitinho-surface-2 text-commitinho-text-soft'
+                              }
+                            `}>
+                              {status === 'locked' ? (
+                                <Lock className="h-4 w-4" />
+                              ) : status === 'completed' ? (
+                                <Check className="h-4 w-4" />
+                              ) : (
+                                index + 1
+                              )}
+                            </div>
+                            
+                            <div className="text-xs text-commitinho-text font-medium mb-1">
+                              L{index + 1}
+                            </div>
+                            
+                            {/* Stars */}
+                            <div className="flex justify-center space-x-0.5">
+                              {[1, 2, 3].map((starNum) => (
+                                <Star 
+                                  key={starNum}
+                                  className={`h-3 w-3 ${
+                                    starNum <= stars 
+                                      ? 'fill-commitinho-warning text-commitinho-warning' 
+                                      : 'text-commitinho-surface-2'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              
+              {/* Desktop Grid */}
+              <div className="hidden sm:grid sm:grid-cols-4 lg:grid-cols-5 gap-4 mb-6">
                 {basicAdventureLessons.map((lesson, index) => {
                   const status = getBasicLessonStatus(index);
                   const stars = progress.stars[lesson.id] || 0;
@@ -407,10 +483,11 @@ const Aventura = () => {
                         ${status === 'current' ? 'ring-2 ring-commitinho-warning animate-pulse' : ''}
                       `}
                       onClick={() => handleBasicLessonClick(index)}
+                      style={{ minHeight: '80px' }} // Ensure touch target size
                     >
-                      <CardContent className="p-3 text-center">
+                      <CardContent className="p-4 text-center">
                         <div className={`
-                          w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center text-sm
+                          w-10 h-10 sm:w-8 sm:h-8 mx-auto mb-2 rounded-full flex items-center justify-center text-sm sm:text-xs
                           ${status === 'completed' ? 'bg-commitinho-success text-white' :
                             status === 'current' ? 'bg-commitinho-warning text-white' :
                             status === 'available' ? 'bg-primary text-white' :
@@ -430,12 +507,12 @@ const Aventura = () => {
                           Lição {index + 1}
                         </div>
                         
-                        {/* Stars */}
+                        {/* Stars - Larger for mobile */}
                         <div className="flex justify-center space-x-1">
                           {[1, 2, 3].map((starNum) => (
                             <Star 
                               key={starNum}
-                              className={`h-3 w-3 ${
+                              className={`h-4 w-4 sm:h-3 sm:w-3 ${
                                 starNum <= stars 
                                   ? 'fill-commitinho-warning text-commitinho-warning' 
                                   : 'text-commitinho-surface-2'
@@ -449,12 +526,13 @@ const Aventura = () => {
                 })}
               </div>
 
-              {/* Action Button */}
+              {/* Action Button - Mobile Optimized */}
               <div className="text-center">
                 <Button
                   size="lg"
-                  className="bg-gradient-arcade text-white font-semibold shadow-glow-primary hover:shadow-glow-secondary transition-all duration-300 mr-4"
+                  className="bg-gradient-arcade text-white font-semibold shadow-glow-primary hover:shadow-glow-secondary transition-all duration-300 mr-4 min-h-[48px] px-8"
                   onClick={() => {
+                    hapticSuccess(); // Add haptic feedback
                     // Always start with first lesson if no progress, otherwise continue with next
                     const lessonIndex = getCompletedBasicLessons() === 0 ? 0 : currentLessonIndex;
                     const nextLesson = basicAdventureLessons[lessonIndex];
@@ -491,8 +569,8 @@ const Aventura = () => {
             </p>
           </div>
 
-          {/* Modules Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {/* Modules Grid - Mobile First */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
             {CURRICULUM_MODULES.map((module, index) => {
               const moduleProgress = getModuleProgress(module);
               const moduleStars = getModuleStars(module);
@@ -514,6 +592,7 @@ const Aventura = () => {
                   role="button"
                   tabIndex={!isUnlocked ? -1 : 0}
                   aria-disabled={!isUnlocked}
+                  style={{ minHeight: '140px' }} // Ensure adequate touch target
                   aria-label={`${module.title}: ${module.description}. ${
                     !isUnlocked ? `Necessário ${module.requiredXP} XP` :
                     isCompleted ? 'Completo' : 'Em progresso'
@@ -781,11 +860,12 @@ const Aventura = () => {
           </div>
 
           {/* Continue/Practice button for original curriculum */}
-          <div className="mt-12 text-center">
+          <div className="mt-8 text-center px-4">
             <Button 
               size="lg"
-              className="bg-gradient-arcade text-white font-semibold shadow-glow-primary hover:shadow-glow-secondary transition-all duration-300"
+              className="bg-gradient-arcade text-white font-semibold shadow-glow-primary hover:shadow-glow-secondary transition-all duration-300 min-h-[48px] px-8 w-full sm:w-auto"
               onClick={() => {
+                hapticSuccess(); // Add haptic feedback
                 const nextLessonId = getNextLessonId();
                 if (nextLessonId) {
                   navigate(`/licao/${nextLessonId}`);

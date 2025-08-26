@@ -1,28 +1,47 @@
+// capacitor.config.ts  (edite este ARQUIVO, não o terminal)
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.commitinho.app',
-  appName: 'Commitinho',
+  appName: 'commitinho',
   webDir: 'dist',
-  server: {
-    androidScheme: 'https'
+  bundledWebRuntime: false,
+  android: {
+    allowMixedContent: true,
+    captureInput: true,
+    webContentsDebuggingEnabled: false,
+    appendUserAgent: 'Commitinho/1.0',
+    overrideUserAgent: 'Commitinho Mobile App',
+    backgroundColor: '#ffffff',
+    toolbarColor: '#1a1a1a',
+    navigationBarColor: '#1a1a1a',
+    hideLogs: true
+  },
+  ios: {
+    scheme: 'Commitinho',
+    backgroundColor: '#1a1a1a',
+    contentInset: 'automatic',
+    scrollEnabled: true,
+    webContentsDebuggingEnabled: false,
+    limitsNavigationsToAppBoundDomains: true,
+    handleApplicationEvents: true
   },
   plugins: {
+    StatusBar: {
+      style: 'dark',
+      backgroundColor: '#1a1a1a',
+      overlay: false
+    },
     SplashScreen: {
-      launchShowDuration: 3000,
-      backgroundColor: '#0f172a',
-      androidSplashResourceName: 'splash',
-      androidScaleType: 'CENTER_CROP',
+      launchShowDuration: 2000,
+      backgroundColor: '#1a1a1a',
       showSpinner: false,
-      androidSpinnerStyle: 'large',
-      iosSpinnerStyle: 'small',
-      spinnerColor: '#3b82f6',
+      androidScaleType: 'CENTER_CROP',
       splashFullScreen: true,
       splashImmersive: true
     },
-    StatusBar: {
-      style: 'DARK',
-      backgroundColor: '#0f172a'
+    Haptics: {
+      enabled: true
     }
   }
 };
