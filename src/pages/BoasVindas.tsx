@@ -6,10 +6,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertCircle, User, Sparkles, Play } from 'lucide-react';
 import { useSupabase } from '@/hooks/useSupabase';
+import { useSecureStorage } from '@/hooks/useSecureStorage';
+import { useCapacitor } from '@/hooks/useCapacitor';
 
 const BoasVindas = () => {
   const navigate = useNavigate();
   const { user, updateUserProfile } = useSupabase();
+  const { getValue, setValue } = useSecureStorage();
+  const { hapticSuccess } = useCapacitor();
   const [displayName, setDisplayName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -18,12 +22,25 @@ const BoasVindas = () => {
   
   // Check if user already has a name
   useEffect(() => {
-    const savedName = localStorage.getItem('commitinho.display_name');
-    if (savedName && savedName.length >= 2) {
-      // User already has a name, redirect to adventure
-      navigate('/aventura');
-    }
-  }, [navigate]);
+    const checkExistingName = async () => {
+      try {
+        const savedName = await getValue('commitinho.display_name');
+        if (savedName && savedName.length >= 2) {
+          // User already has a name, redirect to adventure
+          navigate('/aventura');
+        }
+      } catch (error) {
+        console.error('Error checking existing name:', error);
+        // Fallback to localStorage
+        const fallbackName = localStorage.getItem('commitinho.display_name');
+        if (fallbackName && fallbackName.length >= 2) {
+          navigate('/aventura');
+        }
+      }
+    };
+
+    checkExistingName();
+  }, [navigate, getValue]);
 
   // Validate name
   const validateName = (name: string): string | null => {
@@ -65,7 +82,10 @@ const BoasVindas = () => {
     try {
       const finalName = displayName.trim();
       
-      // Save to localStorage (always)
+      // Save to secure storage (primary)
+      await setValue('commitinho.display_name', finalName);
+      
+      // Also save to localStorage as fallback
       localStorage.setItem('commitinho.display_name', finalName);
       
       // Save to Supabase if user is logged in
@@ -73,9 +93,12 @@ const BoasVindas = () => {
         await updateUserProfile({ display_name: finalName });
       }
       
-      // Close dialog and redirect to first lesson
+      // Haptic feedback on success
+      hapticSuccess();
+      
+      // Close dialog and redirect to adventure
       setShowNameDialog(false);
-      navigate('/licao/basic-01');
+      navigate('/aventura');
     } catch (err) {
       console.error('Error saving name:', err);
       setError('Erro ao salvar nome. Tente novamente.');
@@ -84,11 +107,21 @@ const BoasVindas = () => {
     }
   };
 
-  const handleSkipName = () => {
-    // Use default name
-    localStorage.setItem('commitinho.display_name', 'Aventureiro');
-    setShowNameDialog(false);
-    navigate('/licao/basic-01');
+  const handleSkipName = async () => {
+    try {
+      // Use default name
+      await setValue('commitinho.display_name', 'Aventureiro');
+      localStorage.setItem('commitinho.display_name', 'Aventureiro');
+      
+      setShowNameDialog(false);
+      navigate('/aventura');
+    } catch (error) {
+      console.error('Error saving default name:', error);
+      // Fallback to just localStorage
+      localStorage.setItem('commitinho.display_name', 'Aventureiro');
+      setShowNameDialog(false);
+      navigate('/aventura');
+    }
   };
 
   const handleImageError = () => {

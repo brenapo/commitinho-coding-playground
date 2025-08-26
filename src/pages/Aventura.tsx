@@ -9,11 +9,17 @@ import { UserProgress, SkillNode } from '@/types/progress';
 import { useSupabaseProgress } from '@/hooks/useSupabaseProgress';
 import { curriculum, basicAdventureWorld, basicAdventureLessons } from '@/data/curriculum';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { CURRICULUM_MODULES, ModuleData } from '@/types/modules';
+import { useSecureStorage } from '@/hooks/useSecureStorage';
+import { useCapacitor } from '@/hooks/useCapacitor';
 
 const Aventura = () => {
   const navigate = useNavigate();
+  const { getValue } = useSecureStorage();
+  const { hapticSuccess } = useCapacitor();
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
   const [showResetDialog, setShowResetDialog] = useState(false);
+  const [childName, setChildName] = useState('Aventureiro');
   const { 
     progress, 
     isLoading, 
@@ -22,6 +28,26 @@ const Aventura = () => {
     getSkillStarsForUser,
     resetUserProgress
   } = useSupabaseProgress();
+
+  // Load child name
+  useEffect(() => {
+    const loadChildName = async () => {
+      try {
+        const name = await getValue('commitinho.display_name');
+        if (name) {
+          setChildName(name);
+        }
+      } catch (error) {
+        // Fallback to localStorage
+        const fallbackName = localStorage.getItem('commitinho.display_name');
+        if (fallbackName) {
+          setChildName(fallbackName);
+        }
+      }
+    };
+
+    loadChildName();
+  }, [getValue]);
 
   // Basic Adventure helpers - MOVE BEFORE CONDITIONAL RETURN
   useEffect(() => {
@@ -81,6 +107,76 @@ const Aventura = () => {
 
   const getBasicOverallProgress = () => {
     return (getCompletedBasicLessons() / basicAdventureLessons.length) * 100;
+  };
+
+  // Module helper functions
+  const getModuleProgress = (module: ModuleData) => {
+    if (!progress) return 0;
+    
+    if (module.id === 'basic-adventure') {
+      return getBasicOverallProgress();
+    }
+    
+    // For other modules, calculate based on completed lessons
+    const completedLessons = module.lessons.filter(lessonId => 
+      (progress.stars[lessonId] || 0) > 0
+    ).length;
+    
+    return (completedLessons / module.lessons.length) * 100;
+  };
+
+  const getModuleStars = (module: ModuleData) => {
+    if (!progress) return 0;
+    
+    if (module.id === 'basic-adventure') {
+      return getTotalBasicStars();
+    }
+    
+    return module.lessons.reduce((total, lessonId) => 
+      total + (progress.stars[lessonId] || 0), 0
+    );
+  };
+
+  const isModuleUnlocked = (module: ModuleData) => {
+    if (!progress || module.unlocked) return true;
+    
+    // Module is unlocked if user has required XP
+    return progress.xp >= (module.requiredXP || 0);
+  };
+
+  const isModuleCompleted = (module: ModuleData) => {
+    if (!progress) return false;
+    
+    if (module.id === 'basic-adventure') {
+      return getCompletedBasicLessons() === basicAdventureLessons.length;
+    }
+    
+    return module.lessons.every(lessonId => (progress.stars[lessonId] || 0) > 0);
+  };
+
+  const getFirstIncompleteLesson = (module: ModuleData) => {
+    if (module.id === 'basic-adventure') {
+      const incompleteIndex = basicAdventureLessons.findIndex(lesson => 
+        (progress?.stars[lesson.id] || 0) === 0
+      );
+      return incompleteIndex >= 0 ? basicAdventureLessons[incompleteIndex].id : basicAdventureLessons[0].id;
+    }
+    
+    const incompleteLesson = module.lessons.find(lessonId => 
+      (progress?.stars[lessonId] || 0) === 0
+    );
+    return incompleteLesson || module.lessons[0];
+  };
+
+  const handleModuleClick = (module: ModuleData) => {
+    if (!isModuleUnlocked(module)) {
+      return; // Module is locked
+    }
+
+    hapticSuccess();
+    
+    const firstLesson = getFirstIncompleteLesson(module);
+    navigate(`/licao/${firstLesson}`);
   };
 
   // Original skills logic
@@ -380,6 +476,140 @@ const Aventura = () => {
               </div>
             </CardContent>
           </Card>
+        </div>
+      </section>
+
+      {/* New Curriculum Modules */}
+      <section className="px-4 pb-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-commitinho-text mb-2">
+              Aventura do {childName} 🚀
+            </h2>
+            <p className="text-commitinho-text-soft">
+              Explore cada módulo e desbloqueie novos conceitos de programação!
+            </p>
+          </div>
+
+          {/* Modules Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {CURRICULUM_MODULES.map((module, index) => {
+              const moduleProgress = getModuleProgress(module);
+              const moduleStars = getModuleStars(module);
+              const isUnlocked = isModuleUnlocked(module);
+              const isCompleted = isModuleCompleted(module);
+
+              return (
+                <Card
+                  key={module.id}
+                  className={`
+                    relative overflow-hidden transition-all duration-300 cursor-pointer
+                    ${!isUnlocked 
+                      ? 'bg-commitinho-surface/50 border-commitinho-surface-2/50 opacity-60' 
+                      : 'bg-commitinho-surface border-commitinho-surface-2 hover:shadow-glow-primary'
+                    }
+                    ${isCompleted ? 'ring-2 ring-commitinho-success' : ''}
+                  `}
+                  onClick={() => handleModuleClick(module)}
+                  role="button"
+                  tabIndex={!isUnlocked ? -1 : 0}
+                  aria-disabled={!isUnlocked}
+                  aria-label={`${module.title}: ${module.description}. ${
+                    !isUnlocked ? `Necessário ${module.requiredXP} XP` :
+                    isCompleted ? 'Completo' : 'Em progresso'
+                  }`}
+                >
+                  {/* Background gradient */}
+                  <div className={`absolute inset-0 bg-gradient-to-br ${module.color} opacity-5`} />
+                  
+                  <CardHeader className="relative">
+                    <div className="flex items-center justify-between">
+                      <div className="text-3xl">{module.icon}</div>
+                      
+                      {/* Lock/Stars/Complete indicator */}
+                      <div className="flex items-center space-x-2">
+                        {!isUnlocked ? (
+                          <div className="flex flex-col items-center">
+                            <Lock className="h-4 w-4 text-commitinho-text-soft" />
+                            <span className="text-xs text-commitinho-text-soft">
+                              {module.requiredXP} XP
+                            </span>
+                          </div>
+                        ) : isCompleted ? (
+                          <div className="flex flex-col items-center">
+                            <Trophy className="h-5 w-5 text-commitinho-success" />
+                            <div className="flex items-center space-x-1">
+                              <Star className="h-3 w-3 fill-commitinho-warning text-commitinho-warning" />
+                              <span className="text-xs font-medium text-commitinho-text">
+                                {moduleStars}
+                              </span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center">
+                            <Play className="h-4 w-4 text-primary" />
+                            <div className="flex items-center space-x-1">
+                              <Star className="h-3 w-3 fill-commitinho-warning text-commitinho-warning" />
+                              <span className="text-xs font-medium text-commitinho-text">
+                                {moduleStars}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <CardTitle className="text-commitinho-text text-lg">
+                      {module.title}
+                    </CardTitle>
+                    <p className="text-sm text-commitinho-text-soft">
+                      {module.description}
+                    </p>
+                  </CardHeader>
+
+                  <CardContent className="relative pt-0">
+                    {/* Progress bar */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-commitinho-text-soft">Progresso</span>
+                        <span className="text-commitinho-text-soft">
+                          {Math.round(moduleProgress)}%
+                        </span>
+                      </div>
+                      <Progress 
+                        value={moduleProgress} 
+                        className="h-2"
+                      />
+                    </div>
+
+                    {/* Lesson indicators */}
+                    <div className="mt-4 grid grid-cols-5 gap-1">
+                      {module.lessons.map((lessonId, lessonIndex) => {
+                        const lessonStars = (progress?.stars[lessonId] || 0);
+                        return (
+                          <div 
+                            key={lessonId}
+                            className={`
+                              h-2 rounded-full
+                              ${lessonStars === 0 
+                                ? 'bg-commitinho-surface-2' 
+                                : lessonStars === 1
+                                ? 'bg-commitinho-warning'
+                                : lessonStars === 2
+                                ? 'bg-primary'
+                                : 'bg-commitinho-success'
+                              }
+                            `}
+                            title={`Lição ${lessonIndex + 1}: ${lessonStars} estrelas`}
+                          />
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
         </div>
       </section>
 
