@@ -16,7 +16,7 @@ export const lessonData = {
       explain: "Use o <code>print</code> para fazer o computador falar <em>Olá, Commitinho</em>.",
       prompt: "Digite seu código nas linhas abaixo:",
       example: {
-        code: "print(\"Oi, amigo!\")",
+        code: "print(\"Oi, {{childName}}!\")",
         runLabel: "▶ Rodar exemplo",
         observation: "Exemplo: diferente do alvo. Agora faça o computador cumprimentar o Commitinho!"
       },

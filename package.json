@@ -8,9 +8,22 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "mobile:build": "npm run build && npx cap sync",
+    "mobile:android": "npm run mobile:build && npx cap run android",
+    "mobile:android:dev": "npm run mobile:build && npx cap run android --livereload",
+    "mobile:open:android": "npx cap open android",
+    "mobile:install": "npm install @capacitor/android @capacitor/haptics @capacitor/status-bar @capacitor/splash-screen @capacitor/preferences @capacitor/share"
   },
   "dependencies": {
+    "@capacitor/android": "^7.4.3",
+    "@capacitor/cli": "^7.4.3",
+    "@capacitor/core": "^7.4.3",
+    "@capacitor/haptics": "^7.0.2",
+    "@capacitor/preferences": "^7.0.2",
+    "@capacitor/share": "^7.0.2",
+    "@capacitor/splash-screen": "^7.0.2",
+    "@capacitor/status-bar": "^7.0.2",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
@@ -79,6 +92,8 @@
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.38.0",
-    "vite": "^5.4.19"
+    "vite": "^5.4.19",
+    "vite-plugin-pwa": "^1.0.3",
+    "workbox-window": "^7.3.0"
   }
 }

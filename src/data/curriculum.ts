@@ -203,6 +203,18 @@ export const lessons: Record<string, LessonData> = {
     concept: 'Condições',
     xp_reward: 30,
     required_accuracy: 70
+  },
+  // Novo: lição para Caça aos Bugs
+  '2-1-1': {
+    id: '2-1-1',
+    world: 2,
+    skill: 1,
+    lesson: 1,
+    title: 'Corrija o Passo Errado',
+    description: 'O programa tem um bug. Descubra o passo errado, corrija e rode novamente.',
+    concept: 'Depuração',
+    xp_reward: 20,
+    required_accuracy: 60
   }
 };
 
@@ -261,6 +273,26 @@ export const curriculum: WorldData[] = [
         completed: false,
         totalStars: 0,
         maxStars: 9
+      }
+    ]
+  },
+  {
+    id: 2,
+    title: 'Caça aos Bugs',
+    description: 'Encontre e corrija erros nos programas dos robôs.',
+    unlocked: true,
+    skills: [
+      {
+        id: '2-1',
+        world: 2,
+        skill: 1,
+        title: 'Depuração',
+        concept: 'Encontrar e corrigir erros',
+        lessons: [lessons['2-1-1']],
+        unlocked: true,
+        completed: false,
+        totalStars: 0,
+        maxStars: 3
       }
     ]
   }

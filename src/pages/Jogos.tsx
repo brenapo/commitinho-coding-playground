@@ -4,59 +4,79 @@ import { Button } from "@/components/ui/button";
 import { Gamepad2, Lock } from "lucide-react";
 import { Link } from "react-router-dom";
 
+type Jogo = {
+  id: number;
+  nome: string;
+  descricao: string;
+  thumbnail: string;
+  habilidades: string[];
+  destaque?: boolean;
+  playable: boolean;
+  path?: string; // obrigatório se playable = true
+};
+
 const Jogos = () => {
-  const jogos = [
+  const jogos: Jogo[] = [
     {
       id: 1,
       nome: "Robo-Correio do Commitinho",
       descricao: "Programe o robô para entregar cartas pela cidade usando comandos simples.",
       thumbnail: "🤖",
       habilidades: ["Sequência", "Repetir"],
-      destaque: true
+      destaque: true,
+      playable: true,
+      path: "/jogo/robocorreio/1",
     },
     {
       id: 2,
-      nome: "Laboratório de Pocoes",
+      nome: "Laboratório de Poções",
       descricao: "Misture ingredientes seguindo receitas condicionais para criar poções mágicas.",
       thumbnail: "🧪",
-      habilidades: ["Se/Então", "Sequência"]
+      habilidades: ["Se/Então", "Sequência"],
+      playable: true,
+      path: "/jogo/pocoes/1",
     },
     {
       id: 3,
       nome: "Caça aos Bugs",
       descricao: "Encontre e corrija erros nos códigos dos outros robôs da galáxia.",
       thumbnail: "🐛",
-      habilidades: ["Depurar", "Se/Então"]
+      habilidades: ["Depurar", "Se/Então"],
+      playable: true,
+      path: "/jogo/caca-aos-bugs",
     },
     {
       id: 4,
       nome: "Fábrica de Pixels",
       descricao: "Crie padrões coloridos usando loops e funções para pintar arte digital.",
       thumbnail: "🎨",
-      habilidades: ["Repetir", "Função"]
+      habilidades: ["Repetir", "Função"],
+      playable: false,
     },
     {
       id: 5,
       nome: "Missão Espacial",
       descricao: "Navegue pela galáxia programando a rota da sua nave espacial.",
       thumbnail: "🚀",
-      habilidades: ["Função", "Sequência"]
+      habilidades: ["Função", "Sequência"],
+      playable: false,
     },
     {
       id: 6,
       nome: "DJ do Futuro",
       descricao: "Componha músicas eletrônicas usando programação e loops musicais.",
       thumbnail: "🎵",
-      habilidades: ["Repetir", "Se/Então"]
-    }
+      habilidades: ["Repetir", "Se/Então"],
+      playable: false,
+    },
   ];
 
-  const coresHabilidades = {
+  const coresHabilidades: Record<string, string> = {
     "Sequência": "bg-primary text-primary-foreground",
-    "Repetir": "bg-secondary text-secondary-foreground", 
+    "Repetir": "bg-secondary text-secondary-foreground",
     "Se/Então": "bg-commitinho-success text-commitinho-success-foreground",
     "Depurar": "bg-destructive text-destructive-foreground",
-    "Função": "bg-commitinho-warning text-commitinho-warning-foreground"
+    "Função": "bg-commitinho-warning text-commitinho-warning-foreground",
   };
 
   return (
@@ -70,10 +90,10 @@ const Jogos = () => {
           <p className="text-base sm:text-lg text-commitinho-text-soft mb-6 sm:mb-8 max-w-2xl mx-auto px-4">
             Aventuras divertidas para aprender programação! Cada jogo ensina conceitos importantes de forma interativa.
           </p>
-          
+
           <div className="flex justify-center">
-            <img 
-              src="/lovable-uploads/ee82c2e5-f68a-417d-9f9d-0394381c468f.png" 
+            <img
+              src="/lovable-uploads/ee82c2e5-f68a-417d-9f9d-0394381c468f.png"
               alt="Commitinho animado"
               className="w-20 h-20 sm:w-24 sm:h-24 commitinho-mascot animate-bounce-in"
             />
@@ -86,12 +106,12 @@ const Jogos = () => {
         <div className="max-w-6xl mx-auto">
           <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {jogos.map((jogo) => (
-              <Card 
+              <Card
                 key={jogo.id}
                 className={`
                   bg-commitinho-surface border-commitinho-surface-2 
                   hover:shadow-glow-primary transition-all duration-300 group
-                  ${jogo.destaque ? 'ring-2 ring-commitinho-warning' : ''}
+                  ${jogo.destaque ? "ring-2 ring-commitinho-warning" : ""}
                 `}
               >
                 <CardHeader className="p-4 sm:p-6">
@@ -109,40 +129,38 @@ const Jogos = () => {
                     {jogo.nome}
                   </CardTitle>
                 </CardHeader>
-                
+
                 <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6 pt-0">
                   <CardDescription className="text-commitinho-text-soft text-sm sm:text-base">
                     {jogo.descricao}
                   </CardDescription>
-                  
+
                   {/* Habilidades */}
                   <div>
-                    <p className="text-xs sm:text-sm font-medium text-commitinho-text mb-2">
-                      Habilidades:
-                    </p>
+                    <p className="text-xs sm:text-sm font-medium text-commitinho-text mb-2">Habilidades:</p>
                     <div className="flex flex-wrap gap-1 sm:gap-2">
                       {jogo.habilidades.map((habilidade) => (
-                        <Badge 
+                        <Badge
                           key={habilidade}
-                          className={`text-xs ${coresHabilidades[habilidade as keyof typeof coresHabilidades]}`}
+                          className={`text-xs ${coresHabilidades[habilidade]}`}
                         >
                           {habilidade}
                         </Badge>
                       ))}
                     </div>
                   </div>
-                  
+
                   {/* Botão de ação */}
-                  {[1, 2].includes(jogo.id) ? (
+                  {jogo.playable && jogo.path ? (
                     <Button asChild className="w-full bg-gradient-arcade text-white text-sm sm:text-base py-2 sm:py-3">
-                      <Link to={jogo.id === 1 ? "/jogo/robocorreio/1" : "/jogo/pocoes/1"}>
+                      <Link to={jogo.path} aria-label={`Jogar ${jogo.nome}`}>
                         <Gamepad2 className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                         Jogar
                       </Link>
                     </Button>
                   ) : (
-                    <Button 
-                      disabled 
+                    <Button
+                      disabled
                       className="w-full bg-commitinho-surface-2 text-commitinho-text-soft cursor-not-allowed hover:bg-commitinho-surface-2 text-sm sm:text-base py-2 sm:py-3"
                     >
                       <Lock className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
@@ -153,7 +171,7 @@ const Jogos = () => {
               </Card>
             ))}
           </div>
-          
+
           {/* Seção de informações adicionais */}
           <div className="mt-12 sm:mt-16 text-center">
             <div className="bg-commitinho-surface rounded-2xl p-6 sm:p-8 max-w-3xl mx-auto">
@@ -161,10 +179,10 @@ const Jogos = () => {
                 🚀 Mais jogos em desenvolvimento!
               </h3>
               <p className="text-commitinho-text-soft mb-4 sm:mb-6 text-sm sm:text-base">
-                Nossa equipe está trabalhando duro para criar mais aventuras divertidas. 
+                Nossa equipe está trabalhando duro para criar mais aventuras divertidas.
                 Cada jogo é projetado para ensinar conceitos de programação de forma gradual e divertida.
               </p>
-              
+
               <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 text-sm">
                 <div className="bg-commitinho-surface-2 p-3 sm:p-4 rounded-lg">
                   <p className="font-medium text-commitinho-text mb-1">⏱️ Sessões curtas</p>

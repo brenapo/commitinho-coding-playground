@@ -102,6 +102,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
   });
   const [selectedChips, setSelectedChips] = useState<string[]>([]);
   const [availableChips, setAvailableChips] = useState<string[]>([]);
+  const [usedChips, setUsedChips] = useState<string[]>([]); // Track which chips have been used
   const [hasExecutedOnce, setHasExecutedOnce] = useState(false);
 
   // Secret box exercise state (for secret_box)
@@ -112,7 +113,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
   useEffect(() => {
     if (activity.id === 'double_print') {
       // Use simple set of chips - just shuffled
-      const chips = ['print', '("', '"Olá, Commitinho"', '")'];
+      const chips = ['print', '("', 'Olá, Commitinho', '")'];
       // Shuffle the chips so they're not in correct order
       const shuffled = [...chips].sort(() => Math.random() - 0.5);
       setAvailableChips(shuffled);
@@ -128,11 +129,11 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
     } else if (activity.id === 'one_line_story') {
       // Basic-05: Story chips with print syntax for creating one-line stories
       const syntaxChips = ['print', '("', '")'];
-      const characters = ['um robô', 'um gato', 'um dragão', 'a turma'];
-      const actions = ['dançou', 'voou', 'achou uma banana', 'contou uma piada'];
-      const places = ['na lua', 'no parque', 'hoje cedo'];
-      const endings = ['e todos riram!', 'foi incrível!', 'fim!'];
-      const extras = ['🎉', '😂', '🍌', '🚀'];
+      const characters = ['um robô,', 'um gato,', 'um dragão,', 'a turma,'];
+      const actions = ['dançou,', 'voou,', 'achou uma banana,', 'contou uma piada,'];
+      const places = ['na lua,', 'no parque,', 'hoje cedo,'];
+      const endings = ['e todos riram!,', 'foi incrível!,', 'fim!,'];
+      const extras = ['🎉,', '😂,', '🍌,', '🚀,'];
       
       const allChips = [
         ...syntaxChips,
@@ -148,26 +149,26 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
     } else if (activity.id === 'primeira_fala') {
       // Basic-01: Presentation phrases with improved syntax + child's name
       const childName = getChildName();
-      const chips = ['print', '("', '")', 'Olá!', 'Olá Commitinho!', 'Eu sou o', 'Eu sou a', childName];
+      const chips = ['print', '("', '")', 'Olá!,', 'Olá Commitinho!,', 'Eu sou o,', 'Eu sou a,', childName + ','];
       const shuffled = [...chips].sort(() => Math.random() - 0.5);
       setAvailableChips(shuffled);
     } else if (activity.id === 'frutas_falantes') {
       // Basic-02: Fruits with print syntax
-      const chips = ['print', '("', '")', '"Banana! 🍌"', '"Maçã! 🍎"', '"Uva! 🍇"', '"Manga! 🥭"', '"Abacaxi! 🍍"'];
+      const chips = ['print', '("', '")', '"Banana!, 🍌"', '"Maçã!, 🍎"', '"Uva!, 🍇"', '"Manga!, 🥭"', '"Abacaxi!, 🍍"'];
       const shuffled = [...chips].sort(() => Math.random() - 0.5);
       setAvailableChips(shuffled);
     } else if (activity.id === 'show_emojis') {
       // Basic-06: Emojis with simplified syntax
-      const chips = ['print', '("', '")', '🚀', '😂', '🍕', '🐱', '✨', '💡'];
+      const chips = ['print', '("', '")', '🚀,', '😂,', '🍕,', '🐱,', '✨,', '💡,'];
       const shuffled = [...chips].sort(() => Math.random() - 0.5);
       setAvailableChips(shuffled);
     } else if (activity.id === 'cartaz_divertido') {
       // Basic-07: Commitinho FC poster with organized chips
       const syntaxChips = ['print', '("', '")'];
-      const teamWords = ['Commitinho FC', 'Vamos Commitinho!', 'Gol do Commitinho!'];
-      const actions = ['Rumo à vitória!', 'Força total!', 'Somos campeões!'];
-      const emojis = ['⚽', '🏆', '🎉', '💪', '🔥', '⭐'];
-      const decorations = ['===', '***', '<<<', '>>>'];
+      const teamWords = ['Commitinho FC,', 'Vamos Commitinho!,', 'Gol do Commitinho!,'];
+      const actions = ['Rumo à vitória!,', 'Força total!,', 'Somos campeões!,'];
+      const emojis = ['⚽,', '🏆,', '🎉,', '💪,', '🔥,', '⭐,'];
+      const decorations = ['===,', '***,', '<<<,', '>>>,'];
       
       const allChips = [
         ...syntaxChips,
@@ -181,7 +182,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
       setAvailableChips(shuffled);
     } else if (activity.id === 'placa_aviso') {
       // Basic-08: Warning signs with print syntax
-      const chips = ['print', '("', '")', '"Cuidado!"', '"Bem-vindos!"', '"Por favor, não corra!"', '"Atenção!"'];
+      const chips = ['print', '("', '")', '"Cuidado!,"', '"Bem-vindos!,"', '"Por favor, não corra!,"', '"Atenção!,"'];
       const shuffled = [...chips].sort(() => Math.random() - 0.5);
       setAvailableChips(shuffled);
     } else if (activity.id === 'cartao_visita') {
@@ -801,13 +802,15 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
     // Reset code and chips for exercises with organize mode
     if (activity.id === 'double_print') {
       setSelectedChips([]);
+      setUsedChips([]);
       setStudentCode('');
       // Re-shuffle the chips
-      const chips = ['print', '("', '"Olá, Commitinho"', '")'];
+      const chips = ['print', '("', 'Olá, Commitinho', '")'];
       const shuffled = [...chips].sort(() => Math.random() - 0.5);
       setAvailableChips(shuffled);
     } else if (activity.id === 'triple_echo') {
       setSelectedChips([]);
+      setUsedChips([]);
       setStudentCode('');
       // Re-shuffle the chips
       const chips = ['print("eco")', 'print("eco")', 'print("eco")'];
@@ -817,63 +820,70 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
       setAvailableChips(shuffled);
     } else if (activity.id === 'one_line_story') {
       setSelectedChips([]);
+      setUsedChips([]);
       setStudentCode('');
       // Re-shuffle the story chips with syntax
       const syntaxChips = ['print', '("', '")'];
-      const characters = ['um robô', 'um gato', 'um dragão', 'a turma'];
-      const actions = ['dançou', 'voou', 'achou uma banana', 'contou uma piada'];
-      const places = ['na lua', 'no parque', 'hoje cedo'];
-      const endings = ['e todos riram!', 'foi incrível!', 'fim!'];
-      const extras = ['🎉', '😂', '🍌', '🚀'];
+      const characters = ['um robô,', 'um gato,', 'um dragão,', 'a turma,'];
+      const actions = ['dançou,', 'voou,', 'achou uma banana,', 'contou uma piada,'];
+      const places = ['na lua,', 'no parque,', 'hoje cedo,'];
+      const endings = ['e todos riram!,', 'foi incrível!,', 'fim!,'];
+      const extras = ['🎉,', '😂,', '🍌,', '🚀,'];
       
       const allChips = [...syntaxChips, ...characters, ...actions, ...places, ...endings, ...extras];
       const shuffled = allChips.sort(() => Math.random() - 0.5);
       setAvailableChips(shuffled);
     } else if (activity.id === 'secret_box') {
       setSelectedChips([]);
+      setUsedChips([]);
       setStudentCode('');
       setSelectedSecret('');
       setSelectedMessageTemplate('');
     } else if (activity.id === 'primeira_fala') {
       setSelectedChips([]);
+      setUsedChips([]);
       setStudentCode('');
       // Re-shuffle the chips for basic-01 + child's name
       const childName = getChildName();
-      const chips = ['print', '("', '")', 'Olá!', 'Olá Commitinho!', 'Eu sou o', 'Eu sou a', childName];
+      const chips = ['print', '("', '")', 'Olá!,', 'Olá Commitinho!,', 'Eu sou o,', 'Eu sou a,', childName + ','];
       const shuffled = [...chips].sort(() => Math.random() - 0.5);
       setAvailableChips(shuffled);
     } else if (activity.id === 'frutas_falantes') {
       setSelectedChips([]);
+      setUsedChips([]);
       setStudentCode('');
       // Re-shuffle the chips for basic-02
-      const chips = ['print', '("', '")', '"Banana! 🍌"', '"Maçã! 🍎"', '"Uva! 🍇"', '"Manga! 🥭"', '"Abacaxi! 🍍"'];
+      const chips = ['print', '("', '")', '"Banana!, 🍌"', '"Maçã!, 🍎"', '"Uva!, 🍇"', '"Manga!, 🥭"', '"Abacaxi!, 🍍"'];
       const shuffled = [...chips].sort(() => Math.random() - 0.5);
       setAvailableChips(shuffled);
     } else if (activity.id === 'show_emojis') {
       setSelectedChips([]);
+      setUsedChips([]);
       setStudentCode('');
       // Re-shuffle the chips for basic-06
-      const chips = ['print', '("', '")', '🚀', '😂', '🍕', '🐱', '✨', '💡'];
+      const chips = ['print', '("', '")', '🚀,', '😂,', '🍕,', '🐱,', '✨,', '💡,'];
       const shuffled = [...chips].sort(() => Math.random() - 0.5);
       setAvailableChips(shuffled);
     } else if (activity.id === 'cartaz_divertido') {
       setSelectedChips([]);
+      setUsedChips([]);
       setStudentCode('');
       // Re-shuffle the chips for basic-07
       const syntaxChips = ['print', '("', '")'];
-      const teamWords = ['Commitinho FC', 'Vamos Commitinho!', 'Gol do Commitinho!'];
-      const actions = ['Rumo à vitória!', 'Força total!', 'Somos campeões!'];
-      const emojis = ['⚽', '🏆', '🎉', '💪', '🔥', '⭐'];
-      const decorations = ['===', '***', '<<<', '>>>'];
+      const teamWords = ['Commitinho FC,', 'Vamos Commitinho!,', 'Gol do Commitinho!,'];
+      const actions = ['Rumo à vitória!,', 'Força total!,', 'Somos campeões!,'];
+      const emojis = ['⚽,', '🏆,', '🎉,', '💪,', '🔥,', '⭐,'];
+      const decorations = ['===,', '***,', '<<<,', '>>>,'];
       
       const allChips = [...syntaxChips, ...teamWords, ...actions, ...emojis, ...decorations];
       const shuffled = allChips.sort(() => Math.random() - 0.5);
       setAvailableChips(shuffled);
     } else if (activity.id === 'placa_aviso') {
       setSelectedChips([]);
+      setUsedChips([]);
       setStudentCode('');
       // Re-shuffle the chips for basic-08
-      const chips = ['print', '("', '")', '"Cuidado!"', '"Bem-vindos!"', '"Por favor, não corra!"', '"Atenção!"'];
+      const chips = ['print', '("', '")', '"Cuidado!,"', '"Bem-vindos!,"', '"Por favor, não corra!,"', '"Atenção!,"'];
       const shuffled = [...chips].sort(() => Math.random() - 0.5);
       setAvailableChips(shuffled);
     } else {
@@ -895,6 +905,12 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
 
   // Chip management functions
   const addChip = (chip: string) => {
+    // Check if chip is already used (not available in tray anymore)
+    if (usedChips.includes(chip)) return;
+    
+    // Mark chip as used (remove from available tray)
+    setUsedChips(prev => [...prev, chip]);
+    
     if (activity.id === 'triple_echo') {
       // For triple echo, add to the first empty slot
       setSelectedChips(prev => {
@@ -914,21 +930,46 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
   };
 
   const removeChip = (index: number) => {
+    let removedChip = '';
+    
     if (activity.id === 'triple_echo') {
       // For triple echo, clear the specific slot but maintain array structure
       setSelectedChips(prev => {
         const newChips = [...prev];
+        removedChip = newChips[index];
         newChips[index] = '';
         return newChips;
       });
     } else {
       // For other exercises, remove by index
-      setSelectedChips(prev => prev.filter((_, i) => i !== index));
+      setSelectedChips(prev => {
+        removedChip = prev[index];
+        return prev.filter((_, i) => i !== index);
+      });
     }
+    
+    // Return chip to available tray (remove from used chips)
+    setUsedChips(prev => prev.filter(chip => chip !== removedChip));
   };
 
   const clearChips = () => {
     setSelectedChips([]);
+    setUsedChips([]); // Return all chips to tray
+  };
+
+  const undoLastChip = () => {
+    if (selectedChips.length === 0) return;
+    
+    if (activity.id === 'triple_echo') {
+      // For triple echo, find the last non-empty slot
+      const lastIndex = selectedChips.map((chip, index) => chip ? index : -1).filter(i => i >= 0).pop();
+      if (lastIndex !== undefined) {
+        removeChip(lastIndex);
+      }
+    } else {
+      // For other exercises, remove the last chip
+      removeChip(selectedChips.length - 1);
+    }
   };
 
   // Reset execution state when switching modes or difficulty
@@ -948,10 +989,12 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
       // When switching to type mode, studentCode is already synchronized
       // Just clear chips for organize mode
       setSelectedChips([]);
+      setUsedChips([]);
     } else {
       // When switching to organize mode, clear chips
       // studentCode remains as is for potential reconstruction
       setSelectedChips([]);
+      setUsedChips([]);
     }
     
     setMode(newMode);
@@ -1297,6 +1340,25 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
                   </div>
                 )}
 
+                {/* Clear All and Undo buttons */}
+                <div className="flex justify-center gap-2">
+                  <button
+                    onClick={undoLastChip}
+                    className="px-3 py-1.5 text-xs bg-orange-600 hover:bg-orange-700 text-white rounded-md transition-colors flex items-center gap-1"
+                    disabled={selectedChips.length === 0}
+                  >
+                    <span>↶</span>
+                    Desfazer Último
+                  </button>
+                  <button
+                    onClick={clearChips}
+                    className="px-3 py-1.5 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded-md transition-colors flex items-center gap-1"
+                  >
+                    <span>🗑️</span>
+                    Limpar Tudo
+                  </button>
+                </div>
+
                 {/* Final code display */}
                 <div className="bg-black/30 rounded-lg p-3">
                   <div className="text-xs text-gray-400 mb-1">Código final:</div>
@@ -1353,7 +1415,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
                       <div>
                         <div className="text-xs text-gray-500 mb-1">🔧 Sintaxe (para formar print("história")):</div>
                         <div className="flex gap-2 overflow-x-auto pb-1">
-                          {['print', '("', '")'].map((chip, index) => (
+                          {['print', '("', '")'].filter(chip => !usedChips.includes(chip)).map((chip, index) => (
                             <button
                               key={index}
                               onClick={() => addChip(chip)}
@@ -1368,7 +1430,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
                       <div>
                         <div className="text-xs text-gray-500 mb-1">👥 Personagens:</div>
                         <div className="flex gap-2 overflow-x-auto pb-1">
-                          {['um robô', 'um gato', 'um dragão', 'a turma'].map((chip, index) => (
+                          {['um robô', 'um gato', 'um dragão', 'a turma'].filter(chip => !usedChips.includes(chip)).map((chip, index) => (
                             <button
                               key={index}
                               onClick={() => addChip(chip)}
@@ -1383,7 +1445,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
                       <div>
                         <div className="text-xs text-gray-500 mb-1">🎭 Ações:</div>
                         <div className="flex gap-2 overflow-x-auto pb-1">
-                          {['dançou', 'voou', 'achou uma banana', 'contou uma piada'].map((chip, index) => (
+                          {['dançou', 'voou', 'achou uma banana', 'contou uma piada'].filter(chip => !usedChips.includes(chip)).map((chip, index) => (
                             <button
                               key={index}
                               onClick={() => addChip(chip)}
@@ -1398,7 +1460,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
                       <div>
                         <div className="text-xs text-gray-500 mb-1">📍 Lugar/tempo:</div>
                         <div className="flex gap-2 overflow-x-auto pb-1">
-                          {['na lua', 'no parque', 'hoje cedo'].map((chip, index) => (
+                          {['na lua', 'no parque', 'hoje cedo'].filter(chip => !usedChips.includes(chip)).map((chip, index) => (
                             <button
                               key={index}
                               onClick={() => addChip(chip)}
@@ -1413,7 +1475,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
                       <div>
                         <div className="text-xs text-gray-500 mb-1">🎬 Final:</div>
                         <div className="flex gap-2 overflow-x-auto pb-1">
-                          {['e todos riram!', 'foi incrível!', 'fim!'].map((chip, index) => (
+                          {['e todos riram!', 'foi incrível!', 'fim!'].filter(chip => !usedChips.includes(chip)).map((chip, index) => (
                             <button
                               key={index}
                               onClick={() => addChip(chip)}
@@ -1428,7 +1490,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
                       <div>
                         <div className="text-xs text-gray-500 mb-1">😊 Emojis:</div>
                         <div className="flex gap-2 overflow-x-auto pb-1">
-                          {['🎉', '😂', '🍌', '🚀'].map((chip, index) => (
+                          {['🎉', '😂', '🍌', '🚀'].filter(chip => !usedChips.includes(chip)).map((chip, index) => (
                             <button
                               key={index}
                               onClick={() => addChip(chip)}
@@ -1447,7 +1509,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
                       <div>
                         <div className="text-xs text-gray-500 mb-1">🔧 Sintaxe (para formar print("cartaz")):</div>
                         <div className="flex gap-2 overflow-x-auto pb-1">
-                          {['print', '("', '")'].map((chip, index) => (
+                          {['print', '("', '")'].filter(chip => !usedChips.includes(chip)).map((chip, index) => (
                             <button
                               key={index}
                               onClick={() => addChip(chip)}
@@ -1462,7 +1524,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
                       <div>
                         <div className="text-xs text-gray-500 mb-1">⚽ Time:</div>
                         <div className="flex gap-2 overflow-x-auto pb-1">
-                          {['Commitinho FC', 'Vamos Commitinho!', 'Gol do Commitinho!'].map((chip, index) => (
+                          {['Commitinho FC', 'Vamos Commitinho!', 'Gol do Commitinho!'].filter(chip => !usedChips.includes(chip)).map((chip, index) => (
                             <button
                               key={index}
                               onClick={() => addChip(chip)}
@@ -1477,7 +1539,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
                       <div>
                         <div className="text-xs text-gray-500 mb-1">💪 Frases de força:</div>
                         <div className="flex gap-2 overflow-x-auto pb-1">
-                          {['Rumo à vitória!', 'Força total!', 'Somos campeões!'].map((chip, index) => (
+                          {['Rumo à vitória!', 'Força total!', 'Somos campeões!'].filter(chip => !usedChips.includes(chip)).map((chip, index) => (
                             <button
                               key={index}
                               onClick={() => addChip(chip)}
@@ -1492,7 +1554,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
                       <div>
                         <div className="text-xs text-gray-500 mb-1">🏆 Emojis esportivos:</div>
                         <div className="flex gap-2 overflow-x-auto pb-1">
-                          {['⚽', '🏆', '🎉', '💪', '🔥', '⭐'].map((chip, index) => (
+                          {['⚽', '🏆', '🎉', '💪', '🔥', '⭐'].filter(chip => !usedChips.includes(chip)).map((chip, index) => (
                             <button
                               key={index}
                               onClick={() => addChip(chip)}
@@ -1507,7 +1569,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
                       <div>
                         <div className="text-xs text-gray-500 mb-1">✨ Decorações:</div>
                         <div className="flex gap-2 overflow-x-auto pb-1">
-                          {['===', '***', '<<<', '>>>'].map((chip, index) => (
+                          {['===', '***', '<<<', '>>>'].filter(chip => !usedChips.includes(chip)).map((chip, index) => (
                             <button
                               key={index}
                               onClick={() => addChip(chip)}
@@ -1522,7 +1584,7 @@ const CodeWriteActivity: React.FC<CodeWriteActivityProps> = ({ activity, onCompl
                   ) : (
                     // For other exercises: single row
                     <div className="flex gap-2 overflow-x-auto pb-2">
-                      {availableChips.map((chip, index) => (
+                      {availableChips.filter(chip => !usedChips.includes(chip)).map((chip, index) => (
                         <button
                           key={index}
                           onClick={() => addChip(chip)}

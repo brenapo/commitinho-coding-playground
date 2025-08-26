@@ -18,6 +18,7 @@ import NotFound from "./pages/NotFound";
 
 import RoboCorreioGame from "@/components/games/robocorreiogame";
 import PotionLabGame from "@/components/games/potionlabgame";
+import BugHuntGame from "./components/games/bughuntgame";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,11 @@ const App = () => (
                   path="/jogo/pocoes/:levelId"
                   element={<PotionLabGame />}
                 />
+
+                <Route
+                  path="/jogo/caca-aos-bugs" 
+                  element={<BugHuntGame />} 
+                 />
 
                 {/* Catch-all */}
                 <Route path="*" element={<NotFound />} />
