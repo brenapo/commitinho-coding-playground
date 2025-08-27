@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(/C:\\Users\\breno\\StudioProjects\\commitinho-coding-playground/**)",
+      "Read(/C:\\Users\\breno\\StudioProjects\\commitinho-coding-playground/**)",
+      "Read(/C:\\Users\\breno\\StudioProjects\\commitinho-coding-playground\\dist/**)",
+      "Read(/C:\\Users\\breno\\StudioProjects\\commitinho-coding-playground\\dist/**)",
+      "Bash(adb:*)",
+      "Bash(./gradlew:*)",
+      "Bash(\"C:\\Users\\breno\\AppData\\Local\\Android\\Sdk\\platform-tools\\adb.exe\" shell am start -n com.commitinho.app/.MainActivity)",
+      "Bash(\"C:\\Users\\breno\\AppData\\Local\\Android\\Sdk\\platform-tools\\adb.exe\" logcat -t 50)",
+      "Bash(\"C:\\Users\\breno\\AppData\\Local\\Android\\Sdk\\platform-tools\\adb.exe\" logcat -s \"Capacitor\" -t 100)",
+      "Bash(\"C:\\Users\\breno\\AppData\\Local\\Android\\Sdk\\platform-tools\\adb.exe\" shell am force-stop com.commitinho.app)",
+      "Bash(\"C:\\Users\\breno\\AppData\\Local\\Android\\Sdk\\platform-tools\\adb.exe\" logcat -s \"com.commitinho.app,Capacitor,WebView,chromium\" -t 50)",
+      "Read(/C:\\Users\\breno\\StudioProjects\\commitinho-coding-playground/**)",
+      "Read(/C:\\Users\\breno\\StudioProjects\\commitinho-coding-playground/**)",
+      "Read(/C:\\Users\\breno\\StudioProjects\\commitinho-coding-playground\\src\\lib/**)",
+      "Read(/C:\\Users\\breno\\StudioProjects\\commitinho-coding-playground/**)",
+      "Bash(npm run build:*)",
+      "Bash(npx cap:*)",
+      "Bash(npm install:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
