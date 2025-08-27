@@ -18,9 +18,18 @@
       "Read(/C:\\Users\\breno\\StudioProjects\\commitinho-coding-playground/**)",
       "Bash(npm run build:*)",
       "Bash(npx cap:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Read(/C:\\Users\\breno\\StudioProjects\\commitinho-coding-playground\\src/**)",
+      "Read(/C:\\Users\\breno\\StudioProjects\\commitinho-coding-playground/**)",
+      "Read(/C:\\Users\\breno\\StudioProjects\\commitinho-coding-playground\\src\\pages/**)",
+      "Read(/C:\\Users\\breno\\StudioProjects\\commitinho-coding-playground\\src\\components\\ui/**)",
+      "Read(/C:\\Users\\breno\\StudioProjects\\commitinho-coding-playground\\src/**)",
+      "Bash(\"C:\\Users\\breno\\AppData\\Local\\Android\\Sdk\\platform-tools\\adb.exe\" install -r \"C:\\Users\\breno\\StudioProjects\\commitinho-coding-playground\\android\\app\\build\\outputs\\apk\\debug\\app-debug.apk\")"
     ],
     "deny": [],
-    "ask": []
+    "ask": [],
+    "additionalDirectories": [
+      "C:\\Users\\breno\\StudioProjects\\commitinho-coding-playground"
+    ]
   }
 }

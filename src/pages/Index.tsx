@@ -6,9 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Gamepad2, Trophy, MessageCircle, Play, RotateCcw, Star } from "lucide-react";
 import { useSupabaseProgress } from '@/hooks/useSupabaseProgress';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { usePersonalization } from '@/utils/personalization';
 
 const Index = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  const { userData, personalizeText, hasCompletedIntro } = usePersonalization();
   const { 
     progress, 
     hasProgress, 
@@ -26,16 +30,16 @@ const Index = () => {
       return;
     }
     
-    // Check if user has a name saved (completed welcome flow)
-    const savedName = localStorage.getItem('commitinho.display_name');
-    const hasCompletedWelcome = savedName && savedName.length >= 2;
-    
-    if (hasProgress && hasCompletedWelcome) {
-      // User has progress AND completed welcome - go to progress page
-      navigate('/aventura/progresso');
+    if (hasCompletedIntro) {
+      // User completed intro - check if has progress
+      if (hasProgress) {
+        navigate('/aventura/progresso');
+      } else {
+        navigate('/modulos');
+      }
     } else {
-      // First time OR hasn't completed welcome - go to welcome page
-      navigate('/aventura/boas-vindas');
+      // First time - go to presentation
+      navigate('/apresentacao');
     }
   };
 
@@ -45,6 +49,105 @@ const Index = () => {
   };
 
   const stats = getProgressStats();
+  
+  if (isMobile) {
+    return (
+      <div className="h-screen bg-commitinho-bg flex flex-col justify-center items-center px-4 overflow-hidden">
+        {/* Mobile optimized single screen layout */}
+        <div className="text-center max-w-sm mx-auto">
+          {/* Mascote compacto */}
+          <div className="flex justify-center mb-6">
+            <div className="relative">
+              <img 
+                src="/assets/commitinho-running.png" 
+                alt="Commitinho - Mascote da programação"
+                className="w-32 h-32 commitinho-mascot animate-float drop-shadow-xl"
+              />
+              <div className="absolute inset-0 bg-gradient-arcade opacity-20 rounded-full blur-2xl animate-pulse"></div>
+            </div>
+          </div>
+          
+          <h1 className="text-2xl font-bold mb-4 leading-tight">
+            <span className="text-commitinho-text">Aprenda programação </span>
+            <span className="gradient-text">brincando!</span>
+          </h1>
+          
+          <p className="text-sm text-commitinho-text-soft mb-6">
+            Mini-jogos divertidos para explorar lógica e criatividade.
+          </p>
+          
+          {/* Seção informativa compacta para mobile */}
+          <div className="bg-commitinho-surface-2 rounded-lg p-3 mb-6">
+            <div className="text-xs text-commitinho-text font-medium mb-1">💾 Por que Commitinho?</div>
+            <div className="text-xs text-commitinho-text-soft">
+              "Commit = salvar código!"
+            </div>
+          </div>
+          
+          <div className="text-xs text-commitinho-warning mb-8 font-medium">
+            {personalizeText("Commitinho, seu amiguinho ♥")}
+          </div>
+          
+          {/* Botões principais */}
+          <div className="flex flex-col gap-3">
+            <Button 
+              size="lg" 
+              onClick={handleStartAdventure}
+              className="w-full bg-gradient-arcade text-white font-semibold shadow-glow-primary hover:shadow-glow-secondary transition-all duration-300 py-4"
+            >
+              <Gamepad2 className="mr-2 h-5 w-5" />
+              {hasProgress ? 'Continuar Aventura' : 'Começar Aventura'}
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              size="lg"
+              onClick={() => navigate('/jogos')}
+              className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground py-4"
+            >
+              Ver Jogos
+            </Button>
+            
+            {hasProgress && (
+              <AlertDialog open={showResetDialog} onOpenChange={setShowResetDialog}>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="w-full border-commitinho-surface-2 text-commitinho-text-soft hover:bg-commitinho-surface-2 hover:text-commitinho-text py-2 text-xs"
+                  >
+                    <RotateCcw className="mr-2 h-3 w-3" />
+                    Reiniciar Progresso
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="bg-commitinho-surface border-commitinho-surface-2 mx-4 max-w-sm">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-commitinho-text">Reiniciar Progresso?</AlertDialogTitle>
+                    <AlertDialogDescription className="text-commitinho-text-soft text-sm">
+                      Esta ação irá apagar todo o seu progresso atual. Esta ação não pode ser desfeita.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter className="flex-col gap-2">
+                    <AlertDialogCancel className="w-full bg-commitinho-surface-2 text-commitinho-text border-commitinho-surface-2 hover:bg-commitinho-surface">
+                      Cancelar
+                    </AlertDialogCancel>
+                    <AlertDialogAction 
+                      onClick={handleResetProgress}
+                      className="w-full bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      Sim, Reiniciar
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  // Desktop layout
   return (
     <div className="min-h-screen bg-commitinho-bg">
       {/* Hero Section */}
@@ -63,8 +166,16 @@ const Index = () => {
                 Descubra o mundo da programação de um jeito super legal!
               </p>
               
+              {/* Seção Por que Commitinho? */}
+              <div className="bg-commitinho-surface-2 rounded-lg p-4 mb-6 sm:mb-8 max-w-lg mx-auto lg:mx-0">
+                <div className="text-sm text-commitinho-text font-medium mb-2">💾 Por que Commitinho?</div>
+                <div className="text-xs text-commitinho-text-soft">
+                  "Meu nome vem de 'commit' - que é como salvamos nosso código no computador!"
+                </div>
+              </div>
+              
               <div className="text-xs sm:text-sm text-commitinho-warning mb-6 sm:mb-8 font-medium">
-                "Commitinho, seu amiguinho &lt;3"
+                {personalizeText("Commitinho, seu amiguinho ♥")}
               </div>
               
               <div className="flex flex-col gap-3 sm:gap-4 justify-center lg:justify-start">
@@ -136,8 +247,72 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Progress Section for returning users */}
-      {hasProgress && stats && (
+      {/* Seção Como Funciona a Aventura - Desktop */}
+      <section className="px-4 py-8 sm:py-12 bg-commitinho-surface">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 sm:mb-8 text-commitinho-text">
+            Como funciona a Aventura?
+          </h2>
+          
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+            <Card className="bg-commitinho-surface-2 border-commitinho-surface-2 text-center hover:shadow-lg transition-all duration-300">
+              <CardContent className="p-4 sm:p-6">
+                <div className="text-3xl mb-3">🎯</div>
+                <div className="text-sm font-bold text-commitinho-text mb-2">Leia a dica</div>
+                <div className="text-xs text-commitinho-text-soft">Entenda o desafio</div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-commitinho-surface-2 border-commitinho-surface-2 text-center hover:shadow-lg transition-all duration-300">
+              <CardContent className="p-4 sm:p-6">
+                <div className="text-3xl mb-3">✅</div>
+                <div className="text-sm font-bold text-commitinho-text mb-2">Escolha a resposta</div>
+                <div className="text-xs text-commitinho-text-soft">Monte o código</div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-commitinho-surface-2 border-commitinho-surface-2 text-center hover:shadow-lg transition-all duration-300">
+              <CardContent className="p-4 sm:p-6">
+                <div className="text-3xl mb-3">⭐</div>
+                <div className="text-sm font-bold text-commitinho-text mb-2">Ganhe pontos</div>
+                <div className="text-xs text-commitinho-text-soft">Acumule XP</div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-commitinho-surface-2 border-commitinho-surface-2 text-center hover:shadow-lg transition-all duration-300">
+              <CardContent className="p-4 sm:p-6">
+                <div className="text-3xl mb-3">🚀</div>
+                <div className="text-sm font-bold text-commitinho-text mb-2">Suba de nível</div>
+                <div className="text-xs text-commitinho-text-soft">Desbloqueie conteúdo</div>
+              </CardContent>
+            </Card>
+          </div>
+          
+          {/* Progresso inicial personalizado */}
+          <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-6 text-center">
+            <h3 className="text-lg font-bold text-commitinho-text mb-4">
+              {personalizeText("Sua jornada, [NOME]!")}
+            </h3>
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div>
+                <div className="text-2xl">🔥</div>
+                <div className="text-sm font-bold text-commitinho-text">Sequência: {userData.streakDays} dias</div>
+              </div>
+              <div>
+                <div className="text-2xl">⭐</div>
+                <div className="text-sm font-bold text-commitinho-text">Nível: {userData.level}</div>
+              </div>
+              <div>
+                <div className="text-2xl">💪</div>
+                <div className="text-sm font-bold text-commitinho-text">Meta: 3 exercícios hoje!</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Progress Section for returning users - only on desktop */}
+      {!isMobile && hasProgress && stats && (
         <section className="px-4 py-8 sm:py-12 bg-commitinho-surface-2">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 sm:mb-8 text-commitinho-text">
@@ -191,64 +366,6 @@ const Index = () => {
         </section>
       )}
 
-      {/* Cards "O que vem por aí" */}
-      <section className="px-4 py-12 sm:py-16 bg-commitinho-surface">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3 sm:mb-4 text-commitinho-text">
-            O que vem por aí
-          </h2>
-          <p className="text-center text-commitinho-text-soft mb-8 sm:mb-12 max-w-2xl mx-auto text-sm sm:text-base px-4">
-            Estamos preparando experiências incríveis para tornar seu aprendizado ainda mais divertido!
-          </p>
-          
-          <div className="grid gap-6 sm:gap-8 md:grid-cols-3">
-            {/* Card 1: Mini-jogos */}
-            <Card className="bg-commitinho-surface-2 border-commitinho-surface-2 hover:shadow-glow-primary transition-all duration-300 group">
-              <CardHeader className="text-center px-4 py-4 sm:px-6 sm:py-6">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-arcade rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:animate-pixel-glow">
-                  <Gamepad2 className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
-                </div>
-                <CardTitle className="text-commitinho-text text-lg sm:text-xl">Mini-jogos</CardTitle>
-              </CardHeader>
-              <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
-                <CardDescription className="text-commitinho-text-soft text-center text-sm sm:text-base">
-                  Jogos interativos que ensinam conceitos de programação como sequência, repetição e condições de forma divertida.
-                </CardDescription>
-              </CardContent>
-            </Card>
-
-            {/* Card 2: Conquistas */}
-            <Card className="bg-commitinho-surface-2 border-commitinho-surface-2 hover:shadow-glow-secondary transition-all duration-300 group">
-              <CardHeader className="text-center px-4 py-4 sm:px-6 sm:py-6">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:animate-pixel-glow">
-                  <Trophy className="h-6 w-6 sm:h-8 sm:w-8 text-secondary-foreground" />
-                </div>
-                <CardTitle className="text-commitinho-text text-lg sm:text-xl">Conquistas</CardTitle>
-              </CardHeader>
-              <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
-                <CardDescription className="text-commitinho-text-soft text-center text-sm sm:text-base">
-                  Colete estrelas e adesivos conforme completa os desafios. Cada vitória é uma nova descoberta!
-                </CardDescription>
-              </CardContent>
-            </Card>
-
-            {/* Card 3: Dicas do Commitinho */}
-            <Card className="bg-commitinho-surface-2 border-commitinho-surface-2 hover:shadow-glow-warning transition-all duration-300 group">
-              <CardHeader className="text-center px-4 py-4 sm:px-6 sm:py-6">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-commitinho-success rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:animate-pixel-glow">
-                  <MessageCircle className="h-6 w-6 sm:h-8 sm:w-8 text-commitinho-success-foreground" />
-                </div>
-                <CardTitle className="text-commitinho-text text-lg sm:text-xl">Dicas do Commitinho</CardTitle>
-              </CardHeader>
-              <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
-                <CardDescription className="text-commitinho-text-soft text-center text-sm sm:text-base">
-                  Seu amiguinho digital sempre pronto para te ajudar com dicas e encorajamento durante a jornada.
-                </CardDescription>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
 
     </div>
   );

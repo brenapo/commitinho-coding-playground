@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Navigation from "@/components/ui/navigation";
 import ChatWidget from "@/components/ui/chat-widget";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 import Index from "./pages/Index";
 import Jogos from "./pages/Jogos";
@@ -15,6 +16,10 @@ import BoasVindas from "./pages/BoasVindas";
 import ProgressoAventura from "./pages/ProgressoAventura";
 import Licao from "./pages/Licao";
 import NotFound from "./pages/NotFound";
+import Apresentacao from "./pages/Apresentacao";
+import Modulos from "./pages/Modulos";
+import Exercicio from "./pages/Exercicio";
+import ExercicioAprimorado from "./pages/ExercicioAprimorado";
 
 import RoboCorreioGame from "@/components/games/robocorreiogame";
 import PotionLabGame from "@/components/games/potionlabgame";
@@ -22,16 +27,19 @@ import BugHuntGame from "./components/games/bughuntgame";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <div className="min-h-screen bg-commitinho-bg">
-            <Navigation />
-            <main>
+const App = () => {
+  const isMobile = useIsMobile();
+  
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <AuthProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <div className="min-h-screen bg-commitinho-bg">
+              {!isMobile && <Navigation />}
+              <main>
               <Routes>
                 {/* Páginas principais */}
                 <Route path="/" element={<Index />} />
@@ -40,6 +48,11 @@ const App = () => (
                 <Route path="/aventura/boas-vindas" element={<BoasVindas />} />
                 <Route path="/aventura/progresso" element={<ProgressoAventura />} />
                 <Route path="/licao/:lessonId" element={<Licao />} />
+                
+                {/* Novo fluxo personalizado */}
+                <Route path="/apresentacao" element={<Apresentacao />} />
+                <Route path="/modulos" element={<Modulos />} />
+                <Route path="/exercicio/:moduleId/:exerciseId" element={<ExercicioAprimorado />} />
 
                 {/* Jogo: Robo-Correio */}
                 <Route
@@ -76,6 +89,7 @@ const App = () => (
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
-);
+  );
+};
 
 export default App;

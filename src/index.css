@@ -223,3 +223,148 @@ Paleta "noite arcade" com acentos vibrantes. Todas as cores em HSL.
     animation: none;
   }
 }
+
+/* Estilos para sistema de exercícios estilo Duolingo */
+.word-bank-item {
+  @apply bg-commitinho-surface border-2 border-commitinho-surface-2 text-commitinho-text px-4 py-3 rounded-lg font-mono cursor-pointer transition-all duration-200;
+}
+
+.word-bank-item:hover {
+  @apply bg-commitinho-surface-2 scale-105 shadow-lg;
+}
+
+.selected-word {
+  @apply bg-blue-600 text-white px-3 py-2 rounded-lg font-mono cursor-pointer transition-all duration-200;
+}
+
+.selected-word:hover {
+  @apply bg-blue-500 scale-105;
+}
+
+.code-editor {
+  @apply bg-gray-900 rounded-lg p-4 min-h-[100px] font-mono text-sm;
+}
+
+.code-line {
+  @apply text-green-400 mb-2;
+}
+
+.placeholder-text {
+  @apply text-gray-500 font-mono text-sm;
+}
+
+.commitinho-speech-bubble {
+  @apply bg-commitinho-surface-2 rounded-lg p-3 relative;
+}
+
+.commitinho-speech-bubble::before {
+  content: '';
+  @apply absolute -left-2 top-4 w-0 h-0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 8px solid hsl(var(--surface-2));
+}
+
+/* Animações para feedback */
+@keyframes word-select {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+@keyframes success-pulse {
+  0% { transform: scale(1); background-color: rgb(34, 197, 94); }
+  50% { transform: scale(1.02); background-color: rgb(22, 163, 74); }
+  100% { transform: scale(1); background-color: rgb(34, 197, 94); }
+}
+
+@keyframes error-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.animate-word-select {
+  animation: word-select 0.3s ease-in-out;
+}
+
+.animate-success-pulse {
+  animation: success-pulse 0.6s ease-in-out;
+}
+
+.animate-error-shake {
+  animation: error-shake 0.5s ease-in-out;
+}
+
+/* Estilos para progress hearts */
+.heart-container {
+  @apply flex justify-center gap-1;
+}
+
+.heart-icon {
+  @apply w-6 h-6 transition-all duration-300;
+}
+
+.heart-icon.full {
+  @apply text-red-500;
+  fill: currentColor;
+}
+
+.heart-icon.empty {
+  @apply text-gray-300;
+}
+
+/* Responsive touch targets for mobile */
+@media (max-width: 768px) {
+  .word-bank-item,
+  .selected-word {
+    @apply min-h-[48px] min-w-[48px] flex items-center justify-center;
+  }
+  
+  .touch-feedback:active {
+    @apply scale-95;
+  }
+}
+
+/* Duolingo-style success/error states */
+.result-success {
+  @apply bg-green-100 border-2 border-green-500 rounded-lg p-4;
+}
+
+.result-error {
+  @apply bg-red-100 border-2 border-red-500 rounded-lg p-4;
+}
+
+.result-success .result-title {
+  @apply text-green-700 font-bold text-center mb-3;
+}
+
+.result-error .result-title {
+  @apply text-red-700 font-bold text-center mb-3;
+}
+
+/* Gradient backgrounds for different contexts */
+.bg-gradient-success {
+  background: linear-gradient(135deg, rgb(34, 197, 94) 0%, rgb(22, 163, 74) 100%);
+}
+
+.bg-gradient-error {
+  background: linear-gradient(135deg, rgb(239, 68, 68) 0%, rgb(220, 38, 38) 100%);
+}
+
+.bg-gradient-arcade {
+  background: var(--gradient-arcade);
+}
+
+/* Enhanced shadow utilities */
+.shadow-glow-primary {
+  box-shadow: var(--glow-primary);
+}
+
+.shadow-glow-secondary {
+  box-shadow: var(--glow-secondary);
+}
+
+.shadow-glow-warning {
+  box-shadow: var(--glow-warning);
+}
