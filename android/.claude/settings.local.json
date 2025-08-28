@@ -24,7 +24,10 @@
       "Read(/C:\\Users\\breno\\StudioProjects\\commitinho-coding-playground\\src\\pages/**)",
       "Read(/C:\\Users\\breno\\StudioProjects\\commitinho-coding-playground\\src\\components\\ui/**)",
       "Read(/C:\\Users\\breno\\StudioProjects\\commitinho-coding-playground\\src/**)",
-      "Bash(\"C:\\Users\\breno\\AppData\\Local\\Android\\Sdk\\platform-tools\\adb.exe\" install -r \"C:\\Users\\breno\\StudioProjects\\commitinho-coding-playground\\android\\app\\build\\outputs\\apk\\debug\\app-debug.apk\")"
+      "Bash(\"C:\\Users\\breno\\AppData\\Local\\Android\\Sdk\\platform-tools\\adb.exe\" install -r \"C:\\Users\\breno\\StudioProjects\\commitinho-coding-playground\\android\\app\\build\\outputs\\apk\\debug\\app-debug.apk\")",
+      "Bash(npx tsx:*)",
+      "Bash(\"C:\\Users\\breno\\AppData\\Local\\Android\\Sdk\\platform-tools\\adb.exe\" install -r \"app\\build\\outputs\\apk\\debug\\app-debug.apk\")",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": [],
