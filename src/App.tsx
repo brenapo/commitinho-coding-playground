@@ -4,6 +4,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
+// Import do Design System de Exercícios
+import "@/styles/exercise-design-system.css";
+
 import Navigation from "@/components/ui/navigation";
 import ChatWidget from "@/components/ui/chat-widget";
 import { AuthProvider } from "@/components/auth/AuthProvider";

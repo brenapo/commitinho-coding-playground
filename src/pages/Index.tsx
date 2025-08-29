@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Gamepad2, Trophy, MessageCircle, Play, RotateCcw, Star } from "lucide-react";
+import { Gamepad2, Trophy, Play, RotateCcw, Star } from "lucide-react";
 import { useSupabaseProgress } from '@/hooks/useSupabaseProgress';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { usePersonalization } from '@/utils/personalization';

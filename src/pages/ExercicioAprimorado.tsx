@@ -12,6 +12,19 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useGamification } from '@/utils/gamificationSystem';
 import { usePythonSimulator } from '@/utils/pythonSimulator';
 import { validarResposta, ExerciseData, validarExercicioModulo1, obterMensagemCommitinho } from '@/utils/exerciseValidation';
+import {
+  ExerciseHeader,
+  ExercisePrompt,
+  CodeTerminal,
+  WordChip,
+  ChipTray,
+  ExerciseFeedback,
+  HintButton,
+  ExerciseMascot,
+  ActionButtons,
+  ExerciseContainer
+} from '@/components/ui/ExerciseDesignSystem';
+import '@/styles/exercise-design-system.css';
 
 // Funções do sistema de pop-ups
 const obterNomeUsuario = () => {
@@ -900,145 +913,109 @@ const ExercicioAprimorado = () => {
   // USANDO NOVA INTERFACE MOBILE
   if (true) {
     return (
-      <div className="tela-exercicio-estatica">
-        {/* Header do exercício mais visível */}
-        <div className="header-exercicio">
-          <div className="titulo-exercicio" style={{textAlign: 'center', flex: 1}}>
-            <h2 className="titulo-principal-compacto">
-              {personalizeText(exercise.titulo)}
-            </h2>
-            <p className="subtitulo-compacto">
-              Exercício {currentExercise + 1} de {totalExercises} - {exercise.explicacao.conceito}
-            </p>
-          </div>
-          
-          <Button variant="ghost" size="sm" onClick={() => navigate('/modulos')} className="p-2">
-            <X className="h-5 w-5 text-commitinho-text-soft" />
+      <ExerciseContainer>
+        {/* Navigation */}
+        <div className="absolute top-4 right-4 z-10">
+          <Button variant="ghost" size="sm" onClick={() => navigate('/modulos')} className="p-2 rounded-full bg-black bg-opacity-30 backdrop-blur-sm text-white shadow-lg hover:bg-opacity-50">
+            <X className="h-5 w-5" />
           </Button>
         </div>
-        
-        {/* Progresso e XP */}
-        <div className="progresso-linha" style={{padding: '8px 16px', background: 'hsl(221, 30%, 15%)', borderBottom: '1px solid hsl(221, 25%, 20%)'}}>
-          <Progress value={progress} className="h-2 flex-1 mr-4" />
-          <div className="text-sm font-bold text-commitinho-text">
-            {currentExercise + 1}/{totalExercises}
-          </div>
-          
-          {showXPAnimation && (
-            <div className="xp-rapido ml-4">
-              <div className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold animate-bounce-in">
-                <Star className="h-4 w-4 inline mr-1" />
-                +{xpGained}
-              </div>
-            </div>
-          )}
-        </div>
-        
-        
-        {/* Área central - sempre visível */}
-        <div className="area-principal" style={{flex: 1, padding: '16px', paddingTop: '8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly'}}>
-          <div className="pergunta-fixa">
-            {personalizeText(exercise.pergunta)}
-          </div>
-          
-          <div className="codigo-area-compacta" style={{background: 'hsl(221, 30%, 15%)', borderRadius: '12px', padding: '16px', border: '2px solid hsl(221, 25%, 20%)', minHeight: '80px'}}>
-            {exercise.codigo_inicial && (
-              <div className="codigo-inicial">
-                {personalizeText(exercise.codigo_inicial)}
-              </div>
-            )}
-            <div className="codigo-montado">
-              {selectedWords.length > 0 ? (
-                selectedWords.map((word, index) => (
-                  <span
-                    key={index}
-                    onClick={() => handleWordClick(word, true)}
-                    className="palavra-selecionada"
-                  >
-                    {personalizeText(word)}
-                  </span>
-                ))
-              ) : (
-                <div className="placeholder-codigo">
-                  Monte seu código aqui ✨
-                </div>
-              )}
-            </div>
-          </div>
-          
-          <div className="bandeja-compacta">
-            {availableWords.map((word, index) => (
-              <button
-                key={index}
-                onClick={() => handleWordClick(word)}
-                className="palavra-bandeja"
-              >
-                {personalizeText(word)}
-              </button>
-            ))}
-          </div>
-        </div>
-        
-        {/* Commitinho de ajuda no canto - menor */}
-        <div 
-          className="commitinho-canto" 
-          onClick={() => abrirPopupAjuda()}
-          style={{
-            position: 'fixed',
-            bottom: '90px',
-            right: '20px',
-            zIndex: 100,
-            cursor: 'pointer'
-          }}
-        >
-          <img 
-            src="/assets/commitinho-running.png" 
-            alt="Commitinho Ajuda"
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '50%',
-              background: 'hsl(221, 30%, 15%)',
-              border: '2px solid hsl(191, 95%, 55%)',
-              padding: '2px',
-              animation: 'commitinho-float 3s ease-in-out infinite'
-            }}
+
+        {/* Header com novo design */}
+        <div className="exercise-section mt-16">
+          <ExerciseHeader
+            title={personalizeText(exercise.titulo)}
+            subtitle={`${exercise.explicacao.conceito} • Exercício ${currentExercise + 1} de ${totalExercises}`}
+            icon="🤖💻"
+            progress={progress}
+            currentExercise={currentExercise + 1}
+            totalExercises={totalExercises}
           />
-          <div className="pulso-ajuda" id="pulsoAjuda" style={{
-            position: 'absolute',
-            top: '-6px',
-            right: '-6px',
-            background: 'hsl(45, 95%, 60%)',
-            color: 'hsl(221, 35%, 11%)',
-            borderRadius: '50%',
-            width: '20px',
-            height: '20px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '10px',
-            animation: 'pulso-continuo 2s infinite',
-            boxShadow: '0 0 15px hsl(45, 95%, 60%)'
-          }}>💡</div>
         </div>
         
-        {/* Botões de ação fixos - layout mobile melhorado */}
-        <div className="botoes-container-fixo">
-          <div className="botoes-inferiores">
+        {/* Animação de XP */}
+        {showXPAnimation && (
+          <div className="fixed top-24 right-4 z-50">
+            <div className="bg-gradient-to-r from-green-400 to-green-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-xl animate-bounce">
+              <Star className="h-4 w-4 inline mr-1" />
+              +{xpGained} XP
+            </div>
+          </div>
+        )}
+        
+        {/* Prompt da pergunta */}
+        <ExercisePrompt centered>
+          {personalizeText(exercise.pergunta)}
+        </ExercisePrompt>
+        
+        {/* Terminal de código */}
+        <div className="exercise-section">
+          <CodeTerminal 
+            placeholder="Monte seu código aqui ✨"
+            showInitialCode={!!exercise.codigo_inicial}
+            initialCode={exercise.codigo_inicial ? personalizeText(exercise.codigo_inicial) : ""}
+          >
+            <div className="flex flex-wrap gap-3 justify-center">
+              {selectedWords.map((word, index) => (
+                <WordChip
+                  key={index}
+                  word={personalizeText(word)}
+                  isSelected={true}
+                  isCommand={word === 'print'}
+                  isString={word.includes("'") || word.includes('"')}
+                  isSymbol={['(', ')', '='].includes(word)}
+                  onClick={() => handleWordClick(word, true)}
+                  variant="lego"
+                />
+              ))}
+            </div>
+          </CodeTerminal>
+        </div>
+        
+        {/* Bandeja de palavras */}
+        <div className="exercise-section">
+          <ChipTray>
+            <div className="flex flex-wrap gap-3 justify-center">
+              {availableWords.map((word, index) => (
+                <WordChip
+                  key={index}
+                  word={personalizeText(word)}
+                  isCommand={word === 'print'}
+                  isString={word.includes("'") || word.includes('"')}
+                  isSymbol={['(', ')', '='].includes(word)}
+                  onClick={() => handleWordClick(word)}
+                  variant="lego"
+                />
+              ))}
+            </div>
+          </ChipTray>
+        </div>
+        
+        {/* Mascot de ajuda no canto */}
+        <div className="fixed bottom-24 right-4 z-40" onClick={() => abrirPopupAjuda()}>
+          <ExerciseMascot 
+            variant="corner"
+            showPulse={true}
+          />
+        </div>
+        
+        {/* Botões de ação */}
+        <div className="exercise-section">
+          <ActionButtons layout="vertical">
             <button
               onClick={() => abrirPopupAjuda()}
-              className="btn-ajuda sistema-texto"
+              className="btn-secondary w-full max-w-xs mb-4 px-6 py-3 text-base font-semibold"
             >
               💡 Precisa de ajuda?
             </button>
             <button
               onClick={testarCodigoComPopup}
               disabled={selectedWords.length === 0}
-              className="btn-testar sistema-texto"
+              className="btn-primary w-full max-w-xs disabled:opacity-50 disabled:cursor-not-allowed px-8 py-4 text-xl font-bold"
             >
               ▶ Testar código!
             </button>
-          </div>
+          </ActionButtons>
         </div>
 
         {/* Pop-up de resultado compacto */}
@@ -1140,7 +1117,7 @@ const ExercicioAprimorado = () => {
             </button>
           </div>
         </div>
-      </div>
+      </ExerciseContainer>
     );
   }
 

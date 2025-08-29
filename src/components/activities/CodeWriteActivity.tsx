@@ -7,6 +7,13 @@ import ActivityShell from './ActivityShell';
 import SuccessModal from '@/components/ui/SuccessModal';
 import ErrorModal from '@/components/ui/ErrorModal';
 import { getChildName } from '@/utils/templateEngine';
+import {
+  WordChip,
+  ChipTray,
+  ExerciseFeedback,
+  ActionButtons
+} from '@/components/ui/ExerciseDesignSystem';
+import '@/styles/exercise-design-system.css';
 
 type ExampleBlock = {
   code: string;        // código de exemplo read-only

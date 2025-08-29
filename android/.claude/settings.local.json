@@ -27,7 +27,14 @@
       "Bash(\"C:\\Users\\breno\\AppData\\Local\\Android\\Sdk\\platform-tools\\adb.exe\" install -r \"C:\\Users\\breno\\StudioProjects\\commitinho-coding-playground\\android\\app\\build\\outputs\\apk\\debug\\app-debug.apk\")",
       "Bash(npx tsx:*)",
       "Bash(\"C:\\Users\\breno\\AppData\\Local\\Android\\Sdk\\platform-tools\\adb.exe\" install -r \"app\\build\\outputs\\apk\\debug\\app-debug.apk\")",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)",
+      "Bash(\"C:\\Users\\breno\\AppData\\Local\\Android\\Sdk\\platform-tools\\adb.exe\" devices)",
+      "Read(C:\\Users\\breno\\AppData\\Local\\Android\\Sdk\\emulator/**)",
+      "Bash(\"C:\\Users\\breno\\AppData\\Local\\Android\\Sdk\\emulator\\emulator.exe\" -list-avds)",
+      "Bash(\"C:\\Users\\breno\\AppData\\Local\\Android\\Sdk\\emulator\\emulator.exe\" -avd Medium_Phone_API_36.0)",
+      "Bash(timeout:*)"
     ],
     "deny": [],
     "ask": [],

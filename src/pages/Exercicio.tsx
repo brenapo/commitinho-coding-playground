@@ -6,6 +6,19 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { X, Lightbulb, Heart } from "lucide-react";
 import { usePersonalization } from '@/utils/personalization';
 import { useIsMobile } from '@/hooks/use-mobile';
+import {
+  ExerciseHeader,
+  ExercisePrompt,
+  CodeTerminal,
+  WordChip,
+  ChipTray,
+  ExerciseFeedback,
+  HintButton,
+  ExerciseMascot,
+  ActionButtons,
+  ExerciseContainer
+} from '@/components/ui/ExerciseDesignSystem';
+import '@/styles/exercise-design-system.css';
 
 // Dados dos exercícios do Módulo 1
 const exercisesModule1 = [
@@ -138,166 +151,160 @@ const Exercicio = () => {
 
   if (isMobile) {
     return (
-      <div className="min-h-screen bg-commitinho-bg flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 bg-commitinho-surface shadow-sm">
+      <ExerciseContainer>
+        {/* Navigation e Hint */}
+        <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
           <Button
             variant="ghost"
             size="sm"
             onClick={handleBack}
-            className="p-2"
+            className="p-2 rounded-full bg-black bg-opacity-30 backdrop-blur-sm text-white shadow-lg hover:bg-opacity-50"
           >
-            <X className="h-5 w-5 text-commitinho-text-soft" />
+            <X className="h-5 w-5" />
           </Button>
           
-          <div className="flex-1 mx-4">
-            <Progress value={progress} className="h-2" />
+          {/* Hearts */}
+          <div className="flex gap-1">
+            {Array.from({length: 3}).map((_, i) => (
+              <Heart
+                key={i}
+                className={`h-6 w-6 ${
+                  i < hearts ? 'text-red-500 fill-current' : 'text-gray-400'
+                }`}
+              />
+            ))}
           </div>
           
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowHint(true)}
-            className="p-2"
+          <HintButton onClick={() => setShowHint(true)} />
+        </div>
+
+        {/* Header com novo design */}
+        <div className="exercise-section mt-16">
+          <ExerciseHeader
+            title={personalizeText(exercise.titulo)}
+            subtitle={`${personalizeText(exercise.balao_commitinho)} • Exercício ${currentExercise + 1} de ${totalExercises}`}
+            icon="🤖💬"
+            progress={progress}
+            currentExercise={currentExercise + 1}
+            totalExercises={totalExercises}
+          />
+        </div>
+
+        {/* Mascot inline */}
+        <div className="exercise-section">
+          <ExerciseMascot 
+            message={personalizeText(exercise.balao_commitinho)}
+            variant="inline"
+          />
+        </div>
+
+        {/* Prompt da pergunta */}
+        <ExercisePrompt centered>
+          {personalizeText(exercise.pergunta)}
+        </ExercisePrompt>
+
+        {/* Terminal de código */}
+        <div className="exercise-section">
+          <CodeTerminal 
+            placeholder="Monte seu código aqui ✨"
+            showInitialCode={!!exercise.codigo_inicial}
+            initialCode={exercise.codigo_inicial ? personalizeText(exercise.codigo_inicial) : ""}
           >
-            <Lightbulb className="h-5 w-5 text-yellow-500" />
-          </Button>
-        </div>
-
-        {/* Hearts */}
-        <div className="flex justify-center py-2">
-          {Array.from({length: 3}).map((_, i) => (
-            <Heart
-              key={i}
-              className={`h-6 w-6 mx-1 ${
-                i < hearts ? 'text-red-500 fill-current' : 'text-gray-300'
-              }`}
-            />
-          ))}
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 p-4">
-          {/* Commitinho corner */}
-          <div className="flex items-start mb-6">
-            <img 
-              src="/assets/commitinho-running.png" 
-              alt="Commitinho"
-              className="w-12 h-12 mr-3"
-            />
-            <div className="bg-commitinho-surface-2 rounded-lg p-3 relative flex-1">
-              <div className="text-sm text-commitinho-text">
-                {personalizeText(exercise.balao_commitinho)}
-              </div>
-              <div className="absolute -left-2 top-4 w-0 h-0 border-t-4 border-b-4 border-r-4 border-t-transparent border-b-transparent border-r-commitinho-surface-2"></div>
-            </div>
-          </div>
-
-          {/* Question */}
-          <h2 className="text-lg font-bold text-commitinho-text mb-6 text-center">
-            {personalizeText(exercise.pergunta)}
-          </h2>
-
-          {/* Code area */}
-          <div className="bg-gray-900 rounded-lg p-4 mb-6 min-h-[100px]">
-            {exercise.codigo_inicial && (
-              <div className="text-green-400 text-sm font-mono mb-2">
-                {personalizeText(exercise.codigo_inicial)}
-              </div>
-            )}
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-3 justify-center">
               {selectedWords.map((word, index) => (
-                <div
+                <WordChip
                   key={index}
+                  word={personalizeText(word)}
+                  isSelected={true}
+                  isCommand={word === 'print'}
+                  isString={word.includes("'") || word.includes('"')}
+                  isSymbol={['(', ')', '='].includes(word)}
                   onClick={() => handleWordClick(word, true)}
-                  className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-mono cursor-pointer hover:bg-blue-500 transition-colors"
-                >
-                  {personalizeText(word)}
-                </div>
+                  variant="lego"
+                />
               ))}
-              {selectedWords.length === 0 && (
-                <div className="text-gray-500 text-sm font-mono">
-                  Clique nas palavras abaixo para montar o código
-                </div>
-              )}
             </div>
-          </div>
+          </CodeTerminal>
+        </div>
 
-          {/* Word bank */}
-          <div className="mb-6">
-            <div className="flex flex-wrap gap-2 justify-center">
+        {/* Bandeja de palavras */}
+        <div className="exercise-section">
+          <ChipTray>
+            <div className="flex flex-wrap gap-3 justify-center">
               {availableWords.map((word, index) => (
-                <div
+                <WordChip
                   key={index}
+                  word={personalizeText(word)}
+                  isCommand={word === 'print'}
+                  isString={word.includes("'") || word.includes('"')}
+                  isSymbol={['(', ')', '='].includes(word)}
                   onClick={() => handleWordClick(word)}
-                  className="bg-commitinho-surface border-2 border-commitinho-surface-2 text-commitinho-text px-4 py-3 rounded-lg font-mono cursor-pointer hover:bg-commitinho-surface-2 transition-all duration-200 hover:scale-105"
-                >
-                  {personalizeText(word)}
-                </div>
+                  variant="lego"
+                />
               ))}
             </div>
-          </div>
+          </ChipTray>
+        </div>
 
-          {/* Verify button */}
-          <div className="fixed bottom-4 left-4 right-4">
-            {!showResult ? (
-              <Button
+        {/* Botões de ação */}
+        <div className="exercise-section">
+          {!showResult ? (
+            <ActionButtons>
+              <button
                 onClick={handleVerify}
                 disabled={selectedWords.length === 0}
-                className="w-full bg-gradient-arcade text-white font-semibold py-4 text-lg shadow-lg disabled:opacity-50"
+                className="btn-primary w-full max-w-xs disabled:opacity-50 disabled:cursor-not-allowed px-8 py-4 text-xl font-bold"
               >
-                Verificar
-              </Button>
-            ) : (
-              <div className={`p-4 rounded-lg mb-4 ${
-                isCorrect 
-                  ? 'bg-green-100 border-2 border-green-500' 
-                  : 'bg-red-100 border-2 border-red-500'
-              }`}>
-                <div className={`text-center mb-3 font-bold ${
-                  isCorrect ? 'text-green-700' : 'text-red-700'
-                }`}>
-                  {isCorrect 
-                    ? personalizeText("Perfeito, [NOME]! 🎉") 
-                    : "Ops, não foi dessa vez! 😅"
-                  }
-                </div>
-                <Button
+                ✨ Verificar Código
+              </button>
+            </ActionButtons>
+          ) : (
+            <div className="space-y-6">
+              <ExerciseFeedback
+                type={isCorrect ? 'success' : 'error'}
+                message={isCorrect 
+                  ? personalizeText("Perfeito, [NOME]! 🎉") 
+                  : "Ops, não foi dessa vez! 😅"
+                }
+                showConfetti={isCorrect}
+              />
+              <ActionButtons>
+                <button
                   onClick={handleNext}
-                  className={`w-full font-semibold py-3 text-lg ${
+                  className={`btn-primary w-full max-w-xs px-8 py-4 text-xl font-bold ${
                     isCorrect 
-                      ? 'bg-green-500 hover:bg-green-600 text-white' 
-                      : 'bg-red-500 hover:bg-red-600 text-white'
+                      ? 'bg-gradient-to-r from-green-500 to-green-600' 
+                      : 'bg-gradient-to-r from-red-500 to-red-600'
                   }`}
                 >
-                  {currentExercise < totalExercises - 1 ? 'Continuar' : 'Concluir'}
-                </Button>
-              </div>
-            )}
-          </div>
+                  {currentExercise < totalExercises - 1 ? '➡️ Continuar' : '🏁 Concluir'}
+                </button>
+              </ActionButtons>
+            </div>
+          )}
         </div>
 
         {/* Hint Modal */}
         <Dialog open={showHint} onOpenChange={setShowHint}>
-          <DialogContent className="bg-commitinho-surface border-commitinho-surface-2 mx-4 max-w-sm">
+          <DialogContent className="bg-white border-gray-300 mx-4 max-w-md shadow-2xl">
             <DialogHeader>
-              <DialogTitle className="text-commitinho-text flex items-center">
-                <Lightbulb className="h-5 w-5 text-yellow-500 mr-2" />
-                Dica
+              <DialogTitle className="text-gray-800 flex items-center text-lg font-bold">
+                <Lightbulb className="h-6 w-6 text-yellow-500 mr-2" />
+                💡 Dica do Commitinho
               </DialogTitle>
             </DialogHeader>
-            <p className="text-commitinho-text-soft text-sm">
+            <p className="text-gray-700 text-base leading-relaxed py-4">
               {personalizeText(exercise.dica)}
             </p>
             <Button 
               onClick={() => setShowHint(false)}
-              className="w-full bg-gradient-arcade text-white"
+              className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold py-3 text-lg"
             >
-              Entendi!
+              ✨ Entendi!
             </Button>
           </DialogContent>
         </Dialog>
-      </div>
+      </ExerciseContainer>
     );
   }
 
