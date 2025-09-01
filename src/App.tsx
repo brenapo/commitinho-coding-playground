@@ -23,6 +23,7 @@ import Apresentacao from "./pages/Apresentacao";
 import Modulos from "./pages/Modulos";
 import Exercicio from "./pages/Exercicio";
 import ExercicioAprimorado from "./pages/ExercicioAprimorado";
+import ExercicioModerno from "./pages/ExercicioModerno";
 
 import RoboCorreioGame from "@/components/games/robocorreiogame";
 import PotionLabGame from "@/components/games/potionlabgame";
@@ -56,6 +57,9 @@ const App = () => {
                 <Route path="/apresentacao" element={<Apresentacao />} />
                 <Route path="/modulos" element={<Modulos />} />
                 <Route path="/exercicio/:moduleId/:exerciseId" element={<ExercicioAprimorado />} />
+                
+                {/* Exercício moderno redesignado */}
+                <Route path="/exercicio-moderno/:exerciseId" element={<ExercicioModerno />} />
 
                 {/* Jogo: Robo-Correio */}
                 <Route

@@ -51,7 +51,7 @@ const Modulos = () => {
 
   const handleModuleClick = (moduleId: number) => {
     if (moduleId === 1) {
-      navigate(`/exercicio/${moduleId}/1`);
+      navigate(`/exercicio-moderno/1`);
     }
   };
 
