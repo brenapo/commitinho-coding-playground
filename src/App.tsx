@@ -9,7 +9,7 @@ import "@/styles/exercise-design-system.css";
 
 import Navigation from "@/components/ui/navigation";
 import ChatWidget from "@/components/ui/chat-widget";
-import { AuthProvider } from "@/components/auth/AuthProvider";
+// import { AuthProvider } from "@/components/auth/AuthProvider";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 import Index from "./pages/Index";
@@ -36,7 +36,7 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <AuthProvider>
+        {/* <AuthProvider> */}
           <Toaster />
           <Sonner />
           <BrowserRouter>
@@ -89,7 +89,7 @@ const App = () => {
             <ChatWidget />
           </div>
         </BrowserRouter>
-      </AuthProvider>
+        {/* </AuthProvider> */}
     </TooltipProvider>
   </QueryClientProvider>
   );

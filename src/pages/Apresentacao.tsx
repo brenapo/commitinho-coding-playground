@@ -161,21 +161,6 @@ const Apresentacao = () => {
                 />
               </div>
               
-              <div>
-                <Label htmlFor="idade" className="text-lg text-commitinho-text font-medium">
-                  Quantos anos você tem?
-                </Label>
-                <select
-                  id="idade"
-                  value={idade}
-                  onChange={(e) => setIdade(Number(e.target.value))}
-                  className="mt-3 w-full p-4 text-lg bg-commitinho-bg border border-commitinho-surface-2 rounded-md text-commitinho-text"
-                >
-                  {ageOptions.map(age => (
-                    <option key={age} value={age}>{age} anos</option>
-                  ))}
-                </select>
-              </div>
               
               <Button
                 type="submit"

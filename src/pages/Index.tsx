@@ -5,50 +5,35 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Gamepad2, Trophy, Play, RotateCcw, Star } from "lucide-react";
-import { useSupabaseProgress } from '@/hooks/useSupabaseProgress';
+// import { useSupabaseProgress } from '@/hooks/useSupabaseProgress';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { usePersonalization } from '@/utils/personalization';
+// import { usePersonalization } from '@/utils/personalization';
 
 const Index = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { userData, personalizeText, hasCompletedIntro } = usePersonalization();
-  const { 
-    progress, 
-    hasProgress, 
-    isLoading,
-    resetUserProgress, 
-    getProgressStats, 
-    getNextLessonId, 
-    shouldShowReviewPrompt 
-  } = useSupabaseProgress();
+  // Simplified without hooks for debugging
+  const hasCompletedIntro = false;
+  const hasProgress = false;
+  const isLoading = false;
   const [showResetDialog, setShowResetDialog] = useState(false);
 
   const handleStartAdventure = () => {
-    // Don't proceed if still loading
-    if (isLoading) {
-      return;
-    }
-    
-    if (hasCompletedIntro) {
-      // User completed intro - check if has progress
-      if (hasProgress) {
-        navigate('/aventura/progresso');
-      } else {
-        navigate('/modulos');
-      }
-    } else {
-      // First time - go to presentation
+    console.log('Starting adventure...');
+    try {
+      // Simplified logic for testing
       navigate('/apresentacao');
+    } catch (error) {
+      console.error('Navigation error:', error);
     }
   };
 
   const handleResetProgress = () => {
-    resetUserProgress();
+    // Simplified for testing
     setShowResetDialog(false);
   };
 
-  const stats = getProgressStats();
+  const stats = null;
   
   if (isMobile) {
     return (
@@ -85,7 +70,7 @@ const Index = () => {
           </div>
           
           <div className="text-xs text-commitinho-warning mb-8 font-medium">
-            {personalizeText("Commitinho, seu amiguinho ♥")}
+            Commitinho, seu amiguinho ♥
           </div>
           
           {/* Botões principais */}
@@ -175,7 +160,7 @@ const Index = () => {
               </div>
               
               <div className="text-xs sm:text-sm text-commitinho-warning mb-6 sm:mb-8 font-medium">
-                {personalizeText("Commitinho, seu amiguinho ♥")}
+                Commitinho, seu amiguinho ♥
               </div>
               
               <div className="flex flex-col gap-3 sm:gap-4 justify-center lg:justify-start">
@@ -291,16 +276,16 @@ const Index = () => {
           {/* Progresso inicial personalizado */}
           <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-6 text-center">
             <h3 className="text-lg font-bold text-commitinho-text mb-4">
-              {personalizeText("Sua jornada, [NOME]!")}
+              Sua jornada, amiguinho!
             </h3>
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
                 <div className="text-2xl">🔥</div>
-                <div className="text-sm font-bold text-commitinho-text">Sequência: {userData.streakDays} dias</div>
+                <div className="text-sm font-bold text-commitinho-text">Sequência: 0 dias</div>
               </div>
               <div>
                 <div className="text-2xl">⭐</div>
-                <div className="text-sm font-bold text-commitinho-text">Nível: {userData.level}</div>
+                <div className="text-sm font-bold text-commitinho-text">Nível: Novato</div>
               </div>
               <div>
                 <div className="text-2xl">💪</div>

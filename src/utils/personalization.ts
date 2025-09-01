@@ -50,7 +50,7 @@ export const PersonalizationService = {
   // Verificar se usuário completou apresentação
   hasCompletedIntroduction: (): boolean => {
     const userData = PersonalizationService.getUserData();
-    return userData.name.length >= 2 && userData.age > 0;
+    return userData.name.length >= 2;
   },
 
   // Resetar progresso do usuário
